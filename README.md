@@ -1,7 +1,8 @@
 # NeuroMeet AI
 
 NeuroMeet AI is a Django + Channels realtime meeting app with WebRTC video rooms, live chat, file sharing, whiteboard collaboration, profile management, and a browser-side AI meeting assistant.
-
+## UI Preview
+![UI Preview](image.png)
 ## Current Feature Set
 
 - Multi-user meeting rooms with unique room URLs
