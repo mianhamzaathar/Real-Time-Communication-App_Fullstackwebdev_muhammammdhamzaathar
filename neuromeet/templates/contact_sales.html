@@ -1,0 +1,890 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NeuroMeet AI | Talk to Sales - Enterprise Plans{% endblock %}
+
+{% block meta_description %}Speak with the NeuroMeet AI team about enterprise pricing, custom onboarding, security compliance, and dedicated support for your organization.{% endblock %}
+
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block extra_css %}
+<!-- AOS Animation Library -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<!-- Toastr for notifications -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<style>
+    /* ===== DEEP GREEN THEME - EXACTLY LIKE HOME PAGE ===== */
+    :root {
+        --primary: #1B4D3E;        /* Deep Forest Green */
+        --primary-dark: #0E3529;    /* Dark Forest Green */
+        --primary-light: #2E6B58;   /* Medium Forest Green */
+        --secondary: #235B4A;       /* Pine Green */
+        --accent: #D4A373;          /* Warm Sand (accent) */
+        --success: #1B4D3E;         /* Deep Green */
+        --warning: #E6B17E;         /* Warm Peach */
+        --danger: #C76A6A;          /* Soft Red */
+        --dark: #0E3529;            /* Very Dark Green */
+        --dark-light: #1B4D3E;      /* Deep Green */
+        --light: #FFFFFF;           /* Pure White */
+        --gray: #4A5568;
+        --gray-light: #718096;
+        --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        --gradient-accent: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);
+        --shadow-sm: 0 4px 6px -1px rgba(27, 77, 62, 0.1);
+        --shadow-md: 0 10px 15px -3px rgba(27, 77, 62, 0.15);
+        --shadow-lg: 0 20px 25px -5px rgba(27, 77, 62, 0.2);
+        --shadow-xl: 0 25px 50px -12px rgba(27, 77, 62, 0.25);
+        --border-radius: 1rem;
+        --border-radius-sm: 0.5rem;
+        --border-radius-lg: 2rem;
+        --transition: all 0.3s ease;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        color: var(--dark);
+        line-height: 1.6;
+        background: var(--light);
+    }
+
+    .container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    /* White top logo like login page */
+    .auth-topbar .logo,
+    .auth-topbar .logo-text,
+    .auth-topbar .logo-accent {
+        color: #ffffff;
+    }
+
+    .auth-topbar .logo-mark {
+        border-color: rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.12);
+    }
+
+    .auth-topbar .logo-mark::before,
+    .auth-topbar .logo-mark::after {
+        background: #ffffff;
+    }
+
+    /* ===== BUTTONS - EXACTLY LIKE HOME PAGE ===== */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1.25rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border-radius: var(--border-radius-sm);
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+        z-index: -1;
+    }
+
+    .btn:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary {
+        background: var(--gradient-primary);
+        color: white;
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 2px solid var(--primary);
+        color: var(--primary);
+    }
+
+    .btn-outline:hover {
+        background: var(--primary);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn-lg {
+        padding: 0.75rem 1.4rem;
+        font-size: 0.95rem;
+        width: 100%;
+    }
+
+    /* ===== SALES HERO - MATCHING HOME HERO ===== */
+    .sales-hero {
+        padding: 120px 0 80px;
+        background: var(--gradient-primary);
+        position: relative;
+        overflow: hidden;
+        color: white;
+    }
+
+    .sales-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 30% 50%, rgba(212, 163, 115, 0.15) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    .sales-hero .container {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+    }
+
+    .sales-hero h1 {
+        font-size: clamp(2.5rem, 5vw, 3.75rem);
+        font-weight: 800;
+        margin-bottom: 1rem;
+        color: white;
+        animation: fadeInUp 0.8s ease;
+    }
+
+    .sales-hero p {
+        max-width: 600px;
+        margin: 0 auto;
+        font-size: 1.25rem;
+        color: rgba(255, 255, 255, 0.9);
+        animation: fadeInUp 0.8s ease 0.1s both;
+    }
+
+    /* ===== SALES CONTENT ===== */
+    .sales-content {
+        padding: 80px 0 100px;
+        background: var(--light);
+    }
+
+    .sales-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 2.5rem;
+        align-items: start;
+    }
+
+    /* ===== FORM CARD ===== */
+    .sales-card {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 2.5rem;
+        border: 1px solid rgba(27, 77, 62, 0.1);
+        box-shadow: var(--shadow-xl);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .sales-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-primary);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
+    .sales-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .sales-card h2 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        color: var(--primary-dark);
+    }
+
+    .sales-card > p {
+        color: var(--gray);
+        margin-bottom: 2rem;
+        font-size: 1rem;
+    }
+
+    /* ===== FORM STYLES ===== */
+    .sales-form {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .form-group {
+        display: grid;
+        gap: 0.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--primary-dark);
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-label i {
+        color: var(--primary);
+        font-size: 1rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid rgba(27, 77, 62, 0.1);
+        border-radius: var(--border-radius-sm);
+        font-family: 'Inter', sans-serif;
+        font-size: 1rem;
+        transition: var(--transition);
+        background: var(--light);
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(27, 77, 62, 0.1);
+    }
+
+    .form-control.is-invalid {
+        border-color: var(--danger);
+        background: rgba(199, 106, 106, 0.05);
+    }
+
+    .form-control.is-valid {
+        border-color: var(--success);
+        background: rgba(27, 77, 62, 0.05);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    select.form-control {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231B4D3E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1rem;
+    }
+
+    /* ===== SUCCESS MESSAGE ===== */
+    .sales-success {
+        background: rgba(27, 77, 62, 0.1);
+        border-left: 4px solid var(--success);
+        color: var(--success);
+        border-radius: var(--border-radius-sm);
+        padding: 1rem 1.25rem;
+        margin-bottom: 2rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        animation: slideIn 0.5s ease;
+    }
+
+    .sales-success i {
+        font-size: 1.5rem;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ===== INFO CARD ===== */
+    .sales-info {
+        display: grid;
+        gap: 1.25rem;
+        margin-top: 1rem;
+    }
+
+    .info-item {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+        color: var(--gray);
+        padding: 0.75rem;
+        border-radius: var(--border-radius-sm);
+        transition: var(--transition);
+    }
+
+    .info-item:hover {
+        background: rgba(27, 77, 62, 0.05);
+    }
+
+    .info-item i {
+        color: var(--primary);
+        font-size: 1.25rem;
+        margin-top: 0.2rem;
+    }
+
+    .info-item strong {
+        color: var(--primary-dark);
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-item small {
+        color: var(--gray-light);
+        font-size: 0.85rem;
+    }
+
+    /* ===== CONTACT INFO ===== */
+    .contact-info {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(27, 77, 62, 0.1);
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem;
+        border-radius: var(--border-radius-sm);
+        transition: var(--transition);
+        cursor: pointer;
+    }
+
+    .contact-item:hover {
+        background: rgba(27, 77, 62, 0.05);
+    }
+
+    .contact-item i {
+        color: var(--primary);
+        font-size: 1.25rem;
+        width: 24px;
+    }
+
+    .contact-item div {
+        color: var(--gray);
+    }
+
+    .contact-item strong {
+        color: var(--primary-dark);
+        display: block;
+        font-size: 0.9rem;
+    }
+
+    .contact-item span {
+        font-size: 1rem;
+    }
+
+    /* ===== FEATURE BADGES ===== */
+    .feature-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background: rgba(27, 77, 62, 0.1);
+        color: var(--primary);
+        border-radius: 40px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    /* ===== LOADING SPINNER ===== */
+    .spinner {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fade-in {
+        animation: fadeInUp 0.8s ease forwards;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 968px) {
+        .sales-grid {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .sales-card {
+            padding: 2rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 0 1.5rem;
+        }
+
+        .sales-hero {
+            padding: 100px 0 60px;
+        }
+
+        .sales-hero h1 {
+            font-size: 2rem;
+        }
+
+        .sales-hero p {
+            font-size: 1rem;
+        }
+
+        .sales-content {
+            padding: 60px 0;
+        }
+
+        .sales-card h2 {
+            font-size: 1.75rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .sales-card {
+            padding: 1.5rem;
+        }
+
+        .btn-lg {
+            padding: 0.875rem 1.5rem;
+        }
+    }
+
+    /* Custom scrollbar - matching home page */
+    ::-webkit-scrollbar {
+        width: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: var(--light);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--primary);
+        border-radius: 6px;
+        border: 3px solid var(--light);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-dark);
+    }
+
+    /* Selection color */
+    ::selection {
+        background: var(--primary);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sales-page">
+    <div class="auth-topbar">
+        <a href="{% url 'home' %}" class="logo" aria-label="NeuroMeet AI home">
+            <span class="logo-mark" aria-hidden="true"></span>
+            <span class="logo-text">NeuroMeet<span class="logo-accent">AI</span></span>
+        </a>
+    </div>
+    <!-- Hero Section - Matching Home Page -->
+    <section class="sales-hero">
+        <div class="container">
+            <h1 class="fade-in">Talk to our sales team</h1>
+            <p class="fade-in">Get a tailored plan, enterprise security details, and dedicated onboarding support for your organization.</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="sales-content">
+        <div class="container">
+            <div class="sales-grid">
+                <!-- Left Column - Form -->
+                <div class="sales-card" data-aos="fade-right">
+                    <h2>Request a demo</h2>
+                    <p>Tell us about your team and we'll reach out within 1 business day.</p>
+
+                    <!-- Success Message -->
+                    {% if submitted %}
+                    <div class="sales-success" id="successMessage">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <div>
+                            <strong>Thanks for reaching out!</strong><br>
+                            <span>Our sales team will contact you shortly.</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Error Message -->
+                    <div id="errorMessage" class="sales-success" style="background: rgba(199, 106, 106, 0.1); border-left-color: var(--danger); color: var(--danger); display: none;">
+                        <i class="bi bi-exclamation-circle-fill"></i>
+                        <div>
+                            <strong>Something went wrong!</strong><br>
+                            <span>Please try again or email us directly.</span>
+                        </div>
+                    </div>
+
+                    <form class="sales-form" method="post" action="{% url 'contact-sales' %}" id="salesForm" onsubmit="return validateForm(event)">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="full_name">
+                                <i class="bi bi-person"></i>
+                                Full name <span style="color: var(--danger);">*</span>
+                            </label>
+                            <input class="form-control" id="full_name" name="full_name" type="text" 
+                                   required placeholder="John Smith" 
+                                   oninput="validateField(this)"
+                                   onblur="validateField(this)">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="work_email">
+                                <i class="bi bi-envelope"></i>
+                                Work email <span style="color: var(--danger);">*</span>
+                            </label>
+                            <input class="form-control" id="work_email" name="work_email" type="email" 
+                                   required placeholder="john@company.com"
+                                   oninput="validateField(this)"
+                                   onblur="validateField(this)">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="company">
+                                <i class="bi bi-building"></i>
+                                Company <span style="color: var(--danger);">*</span>
+                            </label>
+                            <input class="form-control" id="company" name="company" type="text" 
+                                   required placeholder="Company Name"
+                                   oninput="validateField(this)"
+                                   onblur="validateField(this)">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="team_size">
+                                <i class="bi bi-people"></i>
+                                Team size <span style="color: var(--danger);">*</span>
+                            </label>
+                            <select class="form-control" id="team_size" name="team_size" required onchange="validateField(this)">
+                                <option value="" disabled selected>Select team size</option>
+                                <option value="1-10">1-10 employees</option>
+                                <option value="11-50">11-50 employees</option>
+                                <option value="51-200">51-200 employees</option>
+                                <option value="201-1000">201-1000 employees</option>
+                                <option value="1000+">1000+ employees</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="message">
+                                <i class="bi bi-chat-text"></i>
+                                What are you looking for?
+                            </label>
+                            <textarea class="form-control" id="message" name="message" rows="4" 
+                                      placeholder="Tell us about your requirements, timeline, and any specific questions..."></textarea>
+                        </div>
+
+                        <!-- Hidden fields for tracking -->
+                        <input type="hidden" name="source" value="sales_page">
+                        <input type="hidden" name="timestamp" id="timestamp">
+
+                        <button class="btn btn-primary btn-lg" type="submit" id="submitBtn">
+                            <span>Send request</span>
+                            <i class="bi bi-send"></i>
+                        </button>
+
+                        <p style="font-size: 0.85rem; color: var(--gray-light); text-align: center; margin-top: 0.5rem;">
+                            <i class="bi bi-shield-check"></i>
+                            Your data is secure and never shared
+                        </p>
+                    </form>
+                </div>
+
+                <!-- Right Column - Information -->
+                <div class="sales-card" data-aos="fade-left">
+                    <h2>What you get</h2>
+                    <p>Enterprise-grade support and features for your organization</p>
+
+                    <div class="sales-info">
+                        <div class="info-item">
+                            <i class="bi bi-shield-check"></i>
+                            <div>
+                                <strong>Security & compliance</strong>
+                                <small>SOC2, GDPR, HIPAA, SSO, audit logs</small>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <i class="bi bi-people"></i>
+                            <div>
+                                <strong>Team onboarding</strong>
+                                <small>Guided setup, training sessions, best practices</small>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <i class="bi bi-graph-up"></i>
+                            <div>
+                                <strong>Custom analytics</strong>
+                                <small>Meeting insights, adoption metrics, ROI tracking</small>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <i class="bi bi-lightning-charge"></i>
+                            <div>
+                                <strong>Priority support</strong>
+                                <small>24/7 dedicated success manager, SLA guarantee</small>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <i class="bi bi-gear"></i>
+                            <div>
+                                <strong>Custom integrations</strong>
+                                <small>Slack, Microsoft Teams, Salesforce, and more</small>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <i class="bi bi-clock-history"></i>
+                            <div>
+                                <strong>Volume discounts</strong>
+                                <small>Custom pricing for large teams (100+ seats)</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feature Badges -->
+                    <div style="margin: 1.5rem 0;">
+                        <span class="feature-badge">✓ SOC2 Type II</span>
+                        <span class="feature-badge">✓ GDPR</span>
+                        <span class="feature-badge">✓ HIPAA</span>
+                        <span class="feature-badge">✓ SSO</span>
+                        <span class="feature-badge">✓ SLA 99.9%</span>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="contact-info">
+                        <div class="contact-item" onclick="copyEmail()">
+                            <i class="bi bi-envelope"></i>
+                            <div>
+                                <strong>Email us directly</strong>
+                                <span>sales@neuromeet.ai</span>
+                            </div>
+                            <i class="bi bi-clipboard" style="margin-left: auto; font-size: 0.9rem;"></i>
+                        </div>
+
+                        <div class="contact-item">
+                            <i class="bi bi-clock"></i>
+                            <div>
+                                <strong>Response time</strong>
+                                <span>&lt; 4 hours (business days)</span>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <i class="bi bi-geo-alt"></i>
+                            <div>
+                                <strong>Our locations</strong>
+                                <span>Remote-first team · APAC, EU, US</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trust Badge -->
+                    <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(27, 77, 62, 0.05); border-radius: var(--border-radius-sm); text-align: center;">
+                        <i class="bi bi-star-fill" style="color: #fbbf24;"></i>
+                        <i class="bi bi-star-fill" style="color: #fbbf24;"></i>
+                        <i class="bi bi-star-fill" style="color: #fbbf24;"></i>
+                        <i class="bi bi-star-fill" style="color: #fbbf24;"></i>
+                        <i class="bi bi-star-fill" style="color: #fbbf24;"></i>
+                        <p style="margin: 0.5rem 0 0; color: var(--gray); font-size: 0.9rem;">
+                            Trusted by 500+ enterprise teams
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Scripts -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script>
+    // Initialize AOS
+    AOS.init({
+        duration: 800,
+        once: true,
+        offset: 100,
+        easing: 'ease-in-out'
+    });
+
+    // Configure toastr
+    toastr.options = {
+        "closeButton": true,
+        "progressBar": true,
+        "positionClass": "toast-top-right",
+        "timeOut": "3000"
+    };
+
+    // Set timestamp
+    document.getElementById('timestamp').value = new Date().toISOString();
+
+    // Form validation
+    function validateField(field) {
+        if (field.value.trim()) {
+            field.classList.remove('is-invalid');
+            field.classList.add('is-valid');
+            return true;
+        } else {
+            field.classList.remove('is-valid');
+            if (field.hasAttribute('required')) {
+                field.classList.add('is-invalid');
+            }
+            return false;
+        }
+    }
+
+    // Email validation
+    function isValidEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+
+    // Form submit handler
+    function validateForm(event) {
+        const submitBtn = document.getElementById('submitBtn');
+        const fields = {
+            full_name: document.getElementById('full_name'),
+            work_email: document.getElementById('work_email'),
+            company: document.getElementById('company'),
+            team_size: document.getElementById('team_size')
+        };
+
+        let isValid = true;
+
+        // Validate all required fields
+        Object.keys(fields).forEach(key => {
+            if (!fields[key].value.trim()) {
+                fields[key].classList.add('is-invalid');
+                isValid = false;
+            } else {
+                fields[key].classList.remove('is-invalid');
+                fields[key].classList.add('is-valid');
+            }
+        });
+
+        // Validate email format
+        if (fields.work_email.value.trim() && !isValidEmail(fields.work_email.value)) {
+            fields.work_email.classList.add('is-invalid');
+            toastr.error('Please enter a valid email address');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            if (event) event.preventDefault();
+            toastr.error('Please fill in all required fields');
+            return false;
+        }
+
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Sending...';
+        }
+
+        return true;
+    }
+
+    // Copy email to clipboard
+    function copyEmail() {
+        const email = 'sales@neuromeet.ai';
+        navigator.clipboard.writeText(email).then(() => {
+            toastr.success('Email copied to clipboard!');
+        }).catch(() => {
+            toastr.error('Could not copy email');
+        });
+    }
+
+    // Auto-dismiss success message after 5 seconds
+    window.addEventListener('load', function() {
+        const successMsg = document.getElementById('successMessage');
+        if (successMsg) {
+            setTimeout(() => {
+                successMsg.style.opacity = '0';
+                setTimeout(() => successMsg.remove(), 300);
+            }, 5000);
+        }
+
+        // Check URL parameters for pre-fill
+        const urlParams = new URLSearchParams(window.location.search);
+        const plan = urlParams.get('plan');
+        if (plan === 'business') {
+            document.getElementById('message').value = 'I am interested in the Business plan. Please contact me with details.';
+            toastr.info('Business plan inquiry pre-filled');
+        }
+    });
+
+    // Real-time validation
+    document.querySelectorAll('.form-control').forEach(input => {
+        input.addEventListener('input', function() {
+            validateField(this);
+        });
+
+        input.addEventListener('blur', function() {
+            validateField(this);
+        });
+    });
+</script>
+{% endblock %}

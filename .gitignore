@@ -1,0 +1,17 @@
+.env
+__pycache__/
+*.py[cod]
+*.sqlite3
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+.vscode/
+.idea/
+*.log
+neuromeet/media/
+node_modules/
+dist/
+build/

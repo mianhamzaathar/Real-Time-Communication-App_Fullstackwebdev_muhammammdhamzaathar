@@ -1,0 +1,2320 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Account | NeuroMeet AI{% endblock %}
+
+{% block meta_description %}Sign up for NeuroMeet AI and start your AI-powered meeting experience. Free plan includes unlimited 1-on-1 meetings.{% endblock %}
+
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Deep Green Theme Variables */
+    :root {
+        --primary-deep: #1B4D3E;
+        --primary-dark: #0E3529;
+        --primary-medium: #2E6B58;
+        --primary-light: #3A7A63;
+        --accent-sand: #D4A373;
+        --accent-warm: #E6B17E;
+        --white-pure: #FFFFFF;
+        --off-white: #F9F7F4;
+        --dark-bg: #0E3529;
+        --text-dark: #1B4D3E;
+        --text-soft: rgba(27, 77, 62, 0.8);
+        --text-muted: rgba(27, 77, 62, 0.6);
+        --shadow-green: rgba(27, 77, 62, 0.1);
+        --shadow-green-dark: rgba(27, 77, 62, 0.15);
+        --gradient-green: linear-gradient(135deg, var(--primary-deep) 0%, var(--primary-medium) 100%);
+        --gradient-sand: linear-gradient(135deg, var(--accent-sand) 0%, var(--accent-warm) 100%);
+        --error-red: #C76A6A;
+        --success-green: #1B4D3E;
+        --warning-orange: #E6B17E;
+    }
+
+    /* Hide global header on auth pages */
+    .header {
+        display: none;
+    }
+
+    .auth-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        background: linear-gradient(135deg, var(--off-white) 0%, #e7efe2 55%, #f6efe5 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-page::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(27, 77, 62, 0.08) 0%, transparent 50%);
+        animation: rotate 30s linear infinite;
+    }
+
+    .auth-page::after {
+        content: '';
+        position: absolute;
+        bottom: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(212, 163, 115, 0.08) 0%, transparent 50%);
+        animation: rotate 30s linear infinite reverse;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .auth-container {
+        max-width: 520px;
+        width: 100%;
+        position: relative;
+        z-index: 10;
+    }
+
+    .auth-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(27, 77, 62, 0.2);
+        padding: 2.5rem;
+        animation: slideUp 0.5s ease;
+        border: 1px solid rgba(27, 77, 62, 0.1);
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    /* NeuroMeet Logo Styles */
+    .auth-logo {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 1.5rem;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .auth-logo svg {
+        width: 100%;
+        height: 100%;
+        filter: drop-shadow(0 8px 20px rgba(27, 77, 62, 0.3));
+    }
+
+    .auth-logo .logo-circle {
+        fill: url(#logoGradient);
+        stroke: var(--primary-deep);
+        stroke-width: 2;
+    }
+
+    .auth-logo .logo-lines {
+        stroke: white;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+    }
+
+    .auth-logo .logo-dot {
+        fill: var(--accent-sand);
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .auth-card h1 {
+        font-size: 2rem;
+        color: var(--primary-dark);
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .auth-subtitle {
+        color: var(--text-soft);
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 1rem;
+    }
+
+    /* Progress Bar */
+    .signup-progress {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2.5rem;
+        position: relative;
+        padding: 0 10px;
+    }
+
+    .signup-progress::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 40px;
+        right: 40px;
+        height: 2px;
+        background: rgba(27, 77, 62, 0.15);
+        transform: translateY(-50%);
+        z-index: 1;
+    }
+
+    .progress-step {
+        width: 45px;
+        height: 45px;
+        background: white;
+        border: 2px solid rgba(27, 77, 62, 0.15);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: var(--text-muted);
+        position: relative;
+        z-index: 2;
+        background: white;
+        transition: all 0.3s ease;
+    }
+
+    .progress-step.active {
+        border-color: var(--primary-deep);
+        color: var(--primary-deep);
+        background: white;
+        transform: scale(1.1);
+    }
+
+    .progress-step.completed {
+        background: var(--primary-deep);
+        border-color: var(--primary-deep);
+        color: white;
+    }
+
+    .progress-step.completed i {
+        font-size: 1.2rem;
+    }
+
+    .progress-step .step-number {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .step-label {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        white-space: nowrap;
+    }
+
+    /* Form Steps */
+    .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .form-step {
+        display: none;
+        animation: fadeIn 0.5s ease;
+    }
+
+    .form-step.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateX(20px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    .auth-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .auth-field span {
+        font-weight: 600;
+        color: var(--primary-dark);
+        font-size: 0.95rem;
+    }
+
+    .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        color: var(--primary-medium);
+        font-size: 1.1rem;
+        transition: color 0.3s ease;
+        opacity: 0.7;
+    }
+
+    .auth-field input,
+    .auth-field select {
+        width: 100%;
+        padding: 1rem 1rem 1rem 3rem;
+        border: 2px solid rgba(27, 77, 62, 0.15);
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+        color: var(--primary-dark);
+    }
+
+    .auth-field select {
+        padding-left: 1rem;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231B4D3E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1rem;
+    }
+
+    .auth-field input:focus,
+    .auth-field select:focus {
+        outline: none;
+        border-color: var(--primary-deep);
+        box-shadow: 0 0 0 4px rgba(27, 77, 62, 0.1);
+    }
+
+    .auth-field input.is-invalid {
+        border-color: var(--error-red);
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23C76A6A'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23C76A6A' stroke='none'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1rem;
+    }
+
+    .auth-field input.is-valid {
+        border-color: var(--primary-deep);
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%231B4D3E' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1rem;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 1rem;
+        background: none;
+        border: none;
+        color: var(--primary-medium);
+        cursor: pointer;
+        padding: 0.5rem;
+        font-size: 1.1rem;
+        transition: color 0.3s ease;
+    }
+
+    .password-toggle:hover {
+        color: var(--primary-deep);
+    }
+
+    .field-error {
+        color: var(--error-red);
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    /* Password Strength */
+    .password-strength {
+        margin-top: 0.75rem;
+        padding: 1rem;
+        background: rgba(27, 77, 62, 0.05);
+        border-radius: 12px;
+        border: 1px solid rgba(27, 77, 62, 0.1);
+    }
+
+    .strength-bar {
+        height: 6px;
+        background: rgba(27, 77, 62, 0.1);
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 0.75rem;
+    }
+
+    .strength-fill {
+        height: 100%;
+        width: 0;
+        transition: width 0.3s ease, background 0.3s ease;
+        border-radius: 3px;
+    }
+
+    .strength-text {
+        font-size: 0.85rem;
+        color: var(--text-soft);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .requirements-list {
+        list-style: none;
+        padding: 0;
+        margin: 0.5rem 0 0;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+
+    .requirements-list li {
+        font-size: 0.8rem;
+        color: var(--text-soft);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .requirements-list li i {
+        font-size: 0.7rem;
+        width: 16px;
+    }
+
+    .requirements-list li.valid {
+        color: var(--primary-deep);
+    }
+
+    .requirements-list li.invalid {
+        color: var(--error-red);
+    }
+
+    /* Password Match */
+    .password-match {
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Form Navigation */
+    .form-navigation {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .btn-prev,
+    .btn-next,
+    .auth-submit {
+        flex: 1;
+        padding: 1rem;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-prev {
+        background: rgba(27, 77, 62, 0.1);
+        color: var(--primary-dark);
+    }
+
+    .btn-prev:hover:not(:disabled) {
+        background: rgba(27, 77, 62, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .btn-next,
+    .auth-submit {
+        background: var(--gradient-green);
+        color: white;
+        box-shadow: 0 4px 12px var(--shadow-green-dark);
+    }
+
+    .btn-next::before,
+    .auth-submit::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .btn-next:hover::before,
+    .auth-submit:hover::before {
+        left: 100%;
+    }
+
+    .btn-next:hover:not(:disabled),
+    .auth-submit:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(27, 77, 62, 0.3);
+    }
+
+    .btn-prev:disabled,
+    .btn-next:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .auth-submit .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 0.5rem;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Features Grid */
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .feature-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        background: rgba(27, 77, 62, 0.05);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(27, 77, 62, 0.1);
+    }
+
+    .feature-checkbox:hover {
+        background: rgba(27, 77, 62, 0.1);
+    }
+
+    .feature-checkbox input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: var(--primary-deep);
+    }
+
+    .feature-checkbox span {
+        font-size: 0.9rem;
+        color: var(--primary-dark);
+    }
+
+    /* Terms Checkbox */
+    .terms-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin: 1.5rem 0;
+        cursor: pointer;
+    }
+
+    .terms-checkbox input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: var(--primary-deep);
+    }
+
+    .terms-checkbox span {
+        color: var(--text-soft);
+        font-size: 0.95rem;
+    }
+
+    .terms-checkbox a {
+        color: var(--primary-deep);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .terms-checkbox a:hover {
+        color: var(--accent-sand);
+        text-decoration: underline;
+    }
+
+    /* Social Signup */
+    .social-signup {
+        margin-top: 2rem;
+        text-align: center;
+    }
+
+    .social-signup p {
+        color: var(--text-soft);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        position: relative;
+    }
+
+    .social-signup p::before,
+    .social-signup p::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        width: 30%;
+        height: 1px;
+        background: rgba(27, 77, 62, 0.15);
+    }
+
+    .social-signup p::before {
+        left: 0;
+    }
+
+    .social-signup p::after {
+        right: 0;
+    }
+
+    .social-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    .social-btn {
+        flex: 1;
+        padding: 0.75rem;
+        border: 2px solid rgba(27, 77, 62, 0.15);
+        border-radius: 12px;
+        background: white;
+        color: var(--primary-dark);
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        max-width: 120px;
+    }
+
+    .social-btn.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+    .social-btn:hover {
+        border-color: var(--primary-deep);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px var(--shadow-green);
+    }
+
+    .social-btn.google:hover {
+        border-color: #DB4437;
+        color: #DB4437;
+    }
+
+    .social-btn.github:hover {
+        border-color: #333;
+        color: #333;
+    }
+
+    /* Auth Footer */
+    .auth-footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(27, 77, 62, 0.15);
+    }
+
+    .auth-footer p {
+        color: var(--text-soft);
+        font-size: 0.95rem;
+    }
+
+    .auth-footer a {
+        color: var(--primary-deep);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+
+    .auth-footer a:hover {
+        color: var(--accent-sand);
+        text-decoration: underline;
+    }
+
+    /* Messages */
+    .error-message {
+        background: rgba(199, 106, 106, 0.1);
+        color: var(--error-red);
+        padding: 1rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        animation: shake 0.5s ease;
+        border-left: 4px solid var(--error-red);
+    }
+
+    .success-message {
+        background: rgba(27, 77, 62, 0.1);
+        color: var(--primary-deep);
+        padding: 1rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        animation: slideDown 0.5s ease;
+        border-left: 4px solid var(--primary-deep);
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+        .auth-card {
+            padding: 2rem 1.5rem;
+        }
+
+        .auth-logo {
+            width: 80px;
+            height: 80px;
+        }
+
+        .requirements-list {
+            grid-template-columns: 1fr;
+        }
+
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .social-buttons {
+            flex-wrap: wrap;
+        }
+
+        .social-btn {
+            max-width: none;
+        }
+
+        .form-navigation {
+            flex-direction: column;
+        }
+
+        .signup-progress {
+            padding: 0;
+        }
+
+        .step-label {
+            display: none;
+        }
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: var(--off-white);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--primary-deep);
+        border-radius: 6px;
+        border: 3px solid var(--off-white);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-dark);
+    }
+
+    /* Selection color */
+    ::selection {
+        background: var(--primary-deep);
+        color: white;
+    }
+    /* Deep Green Theme Variables */
+    :root {
+        --primary-deep: #1B4D3E;
+        --primary-dark: #0E3529;
+        --primary-medium: #2E6B58;
+        --primary-light: #3A7A63;
+        --accent-sand: #D4A373;
+        --accent-warm: #E6B17E;
+        --white-pure: #FFFFFF;
+        --off-white: #F9F7F4;
+        --dark-bg: #0E3529;
+        --text-dark: #1B4D3E;
+        --text-soft: rgba(27, 77, 62, 0.8);
+        --text-muted: rgba(27, 77, 62, 0.6);
+        --shadow-green: rgba(27, 77, 62, 0.1);
+        --shadow-green-dark: rgba(27, 77, 62, 0.15);
+        --gradient-green: linear-gradient(135deg, var(--primary-deep) 0%, var(--primary-medium) 100%);
+        --gradient-sand: linear-gradient(135deg, var(--accent-sand) 0%, var(--accent-warm) 100%);
+        --error-red: #C76A6A;
+        --success-green: #1B4D3E;
+        --warning-orange: #E6B17E;
+    }
+
+    .auth-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        background: linear-gradient(135deg, var(--off-white) 0%, #e7efe2 55%, #f6efe5 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-page::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(27, 77, 62, 0.08) 0%, transparent 50%);
+        animation: rotate 30s linear infinite;
+    }
+
+    .auth-page::after {
+        content: '';
+        position: absolute;
+        bottom: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(212, 163, 115, 0.08) 0%, transparent 50%);
+        animation: rotate 30s linear infinite reverse;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .auth-container {
+        max-width: 520px;
+        width: 100%;
+        position: relative;
+        z-index: 10;
+    }
+
+    .auth-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(27, 77, 62, 0.2);
+        padding: 2.5rem;
+        animation: slideUp 0.5s ease;
+        border: 1px solid rgba(27, 77, 62, 0.1);
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    /* NeuroMeet Logo Styles */
+    .auth-logo {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 1.5rem;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .auth-logo svg {
+        width: 100%;
+        height: 100%;
+        filter: drop-shadow(0 8px 20px rgba(27, 77, 62, 0.3));
+    }
+
+    .auth-logo .logo-circle {
+        fill: url(#logoGradient);
+        stroke: var(--primary-deep);
+        stroke-width: 2;
+    }
+
+    .auth-logo .logo-lines {
+        stroke: white;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+    }
+
+    .auth-logo .logo-dot {
+        fill: var(--accent-sand);
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .auth-card h1 {
+        font-size: 2rem;
+        color: var(--primary-dark);
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .auth-subtitle {
+        color: var(--text-soft);
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 1rem;
+    }
+
+    /* Progress Bar */
+    .signup-progress {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2.5rem;
+        position: relative;
+        padding: 0 10px;
+    }
+
+    .signup-progress::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 40px;
+        right: 40px;
+        height: 2px;
+        background: rgba(27, 77, 62, 0.15);
+        transform: translateY(-50%);
+        z-index: 1;
+    }
+
+    .progress-step {
+        width: 45px;
+        height: 45px;
+        background: white;
+        border: 2px solid rgba(27, 77, 62, 0.15);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: var(--text-muted);
+        position: relative;
+        z-index: 2;
+        background: white;
+        transition: all 0.3s ease;
+    }
+
+    .progress-step.active {
+        border-color: var(--primary-deep);
+        color: var(--primary-deep);
+        background: white;
+        transform: scale(1.1);
+    }
+
+    .progress-step.completed {
+        background: var(--primary-deep);
+        border-color: var(--primary-deep);
+        color: white;
+    }
+
+    .progress-step.completed i {
+        font-size: 1.2rem;
+    }
+
+    .progress-step .step-number {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .step-label {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        white-space: nowrap;
+    }
+
+    /* Form Steps */
+    .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .form-step {
+        display: none;
+        animation: fadeIn 0.5s ease;
+    }
+
+    .form-step.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateX(20px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    .auth-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .auth-field span {
+        font-weight: 600;
+        color: var(--primary-dark);
+        font-size: 0.95rem;
+    }
+
+    .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        color: var(--primary-medium);
+        font-size: 1.1rem;
+        transition: color 0.3s ease;
+        opacity: 0.7;
+    }
+
+    .auth-field input,
+    .auth-field select {
+        width: 100%;
+        padding: 1rem 1rem 1rem 3rem;
+        border: 2px solid rgba(27, 77, 62, 0.15);
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+        color: var(--primary-dark);
+    }
+
+    .auth-field select {
+        padding-left: 1rem;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231B4D3E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1rem;
+    }
+
+    .auth-field input:focus,
+    .auth-field select:focus {
+        outline: none;
+        border-color: var(--primary-deep);
+        box-shadow: 0 0 0 4px rgba(27, 77, 62, 0.1);
+    }
+
+    .auth-field input.is-invalid {
+        border-color: var(--error-red);
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23C76A6A'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23C76A6A' stroke='none'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1rem;
+    }
+
+    .auth-field input.is-valid {
+        border-color: var(--primary-deep);
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%231B4D3E' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1rem;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 1rem;
+        background: none;
+        border: none;
+        color: var(--primary-medium);
+        cursor: pointer;
+        padding: 0.5rem;
+        font-size: 1.1rem;
+        transition: color 0.3s ease;
+    }
+
+    .password-toggle:hover {
+        color: var(--primary-deep);
+    }
+
+    .field-error {
+        color: var(--error-red);
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    /* Password Strength */
+    .password-strength {
+        margin-top: 0.75rem;
+        padding: 1rem;
+        background: rgba(27, 77, 62, 0.05);
+        border-radius: 12px;
+        border: 1px solid rgba(27, 77, 62, 0.1);
+    }
+
+    .strength-bar {
+        height: 6px;
+        background: rgba(27, 77, 62, 0.1);
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 0.75rem;
+    }
+
+    .strength-fill {
+        height: 100%;
+        width: 0;
+        transition: width 0.3s ease, background 0.3s ease;
+        border-radius: 3px;
+    }
+
+    .strength-text {
+        font-size: 0.85rem;
+        color: var(--text-soft);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .requirements-list {
+        list-style: none;
+        padding: 0;
+        margin: 0.5rem 0 0;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+
+    .requirements-list li {
+        font-size: 0.8rem;
+        color: var(--text-soft);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .requirements-list li i {
+        font-size: 0.7rem;
+        width: 16px;
+    }
+
+    .requirements-list li.valid {
+        color: var(--primary-deep);
+    }
+
+    .requirements-list li.invalid {
+        color: var(--error-red);
+    }
+
+    /* Password Match */
+    .password-match {
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Form Navigation */
+    .form-navigation {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .btn-prev,
+    .btn-next,
+    .auth-submit {
+        flex: 1;
+        padding: 1rem;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-prev {
+        background: rgba(27, 77, 62, 0.1);
+        color: var(--primary-dark);
+    }
+
+    .btn-prev:hover:not(:disabled) {
+        background: rgba(27, 77, 62, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .btn-next,
+    .auth-submit {
+        background: var(--gradient-green);
+        color: white;
+        box-shadow: 0 4px 12px var(--shadow-green-dark);
+    }
+
+    .btn-next::before,
+    .auth-submit::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .btn-next:hover::before,
+    .auth-submit:hover::before {
+        left: 100%;
+    }
+
+    .btn-next:hover:not(:disabled),
+    .auth-submit:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(27, 77, 62, 0.3);
+    }
+
+    .btn-prev:disabled,
+    .btn-next:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .auth-submit .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 0.5rem;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Features Grid */
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .feature-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        background: rgba(27, 77, 62, 0.05);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(27, 77, 62, 0.1);
+    }
+
+    .feature-checkbox:hover {
+        background: rgba(27, 77, 62, 0.1);
+    }
+
+    .feature-checkbox input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: var(--primary-deep);
+    }
+
+    .feature-checkbox span {
+        font-size: 0.9rem;
+        color: var(--primary-dark);
+    }
+
+    /* Terms Checkbox */
+    .terms-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin: 1.5rem 0;
+        cursor: pointer;
+    }
+
+    .terms-checkbox input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: var(--primary-deep);
+    }
+
+    .terms-checkbox span {
+        color: var(--text-soft);
+        font-size: 0.95rem;
+    }
+
+    .terms-checkbox a {
+        color: var(--primary-deep);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .terms-checkbox a:hover {
+        color: var(--accent-sand);
+        text-decoration: underline;
+    }
+
+    /* Social Signup */
+    .social-signup {
+        margin-top: 2rem;
+        text-align: center;
+    }
+
+    .social-signup p {
+        color: var(--text-soft);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        position: relative;
+    }
+
+    .social-signup p::before,
+    .social-signup p::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        width: 30%;
+        height: 1px;
+        background: rgba(27, 77, 62, 0.15);
+    }
+
+    .social-signup p::before {
+        left: 0;
+    }
+
+    .social-signup p::after {
+        right: 0;
+    }
+
+    .social-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    .social-btn {
+        flex: 1;
+        padding: 0.75rem;
+        border: 2px solid rgba(27, 77, 62, 0.15);
+        border-radius: 12px;
+        background: white;
+        color: var(--primary-dark);
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        max-width: 120px;
+    }
+
+    .social-btn.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+    .social-btn:hover {
+        border-color: var(--primary-deep);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px var(--shadow-green);
+    }
+
+    .social-btn.google:hover {
+        border-color: #DB4437;
+        color: #DB4437;
+    }
+
+    .social-btn.github:hover {
+        border-color: #333;
+        color: #333;
+    }
+
+    /* Auth Footer */
+    .auth-footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(27, 77, 62, 0.15);
+    }
+
+    .auth-footer p {
+        color: var(--text-soft);
+        font-size: 0.95rem;
+    }
+
+    .auth-footer a {
+        color: var(--primary-deep);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+
+    .auth-footer a:hover {
+        color: var(--accent-sand);
+        text-decoration: underline;
+    }
+
+    /* Messages */
+    .error-message {
+        background: rgba(199, 106, 106, 0.1);
+        color: var(--error-red);
+        padding: 1rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        animation: shake 0.5s ease;
+        border-left: 4px solid var(--error-red);
+    }
+
+    .success-message {
+        background: rgba(27, 77, 62, 0.1);
+        color: var(--primary-deep);
+        padding: 1rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        animation: slideDown 0.5s ease;
+        border-left: 4px solid var(--primary-deep);
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+        .auth-card {
+            padding: 2rem 1.5rem;
+        }
+
+        .auth-logo {
+            width: 80px;
+            height: 80px;
+        }
+
+        .requirements-list {
+            grid-template-columns: 1fr;
+        }
+
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .social-buttons {
+            flex-wrap: wrap;
+        }
+
+        .social-btn {
+            max-width: none;
+        }
+
+        .form-navigation {
+            flex-direction: column;
+        }
+
+        .signup-progress {
+            padding: 0;
+        }
+
+        .step-label {
+            display: none;
+        }
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: var(--off-white);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--primary-deep);
+        border-radius: 6px;
+        border: 3px solid var(--off-white);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-dark);
+    }
+
+    /* Selection color */
+    ::selection {
+        background: var(--primary-deep);
+        color: white;
+    }
+
+    /* Left Brand Panel */
+    .auth-container.auth-layout {
+        max-width: 1020px;
+        display: grid;
+        grid-template-columns: minmax(240px, 1fr) minmax(340px, 520px);
+        gap: 2.5rem;
+        align-items: center;
+    }
+
+    .auth-brand {
+        position: relative;
+        z-index: 10;
+    }
+
+    .auth-brand-card {
+        background: rgba(255, 255, 255, 0.85);
+        border: 1px solid rgba(27, 77, 62, 0.12);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 12px 30px rgba(27, 77, 62, 0.12);
+        backdrop-filter: blur(8px);
+    }
+
+    .auth-brand-logo {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 700;
+        color: var(--primary-dark);
+        margin-bottom: 1.5rem;
+        font-size: 1.1rem;
+    }
+
+    .auth-brand-mark {
+        width: 44px;
+        height: 44px;
+        border-radius: 16px;
+        background: var(--gradient-green);
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 18px rgba(27, 77, 62, 0.25);
+        font-size: 1.1rem;
+    }
+
+    .auth-brand-title {
+        font-size: 2rem;
+        color: var(--primary-dark);
+        margin-bottom: 0.75rem;
+        font-weight: 700;
+    }
+
+    .auth-brand-subtitle {
+        color: var(--text-soft);
+        font-size: 0.98rem;
+        line-height: 1.6;
+    }
+
+    @media (max-width: 900px) {
+        .auth-container.auth-layout {
+            grid-template-columns: 1fr;
+            max-width: 560px;
+        }
+
+        .auth-brand {
+            display: none;
+        }
+    }
+    /* Force single-column auth layout (logo only on top) */
+    .auth-container.auth-layout {
+        display: block;
+        max-width: 520px;
+    }
+
+    .auth-brand {
+        display: none !important;
+    }
+
+    /* Top brand logo */
+    .auth-toplogo {
+        display: flex;
+        justify-content: flex-start;
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    .auth-brand-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        text-decoration: none;
+        color: var(--primary-deep, #1B4D3E);
+    }
+
+    .auth-brand-mark {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: 2px solid currentColor;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .auth-brand-text {
+        font-weight: 700;
+        letter-spacing: 0.2px;
+    }
+    </style>
+{% endblock %}
+
+{% block content %}
+<section class="auth-page">
+    <div class="auth-topbar">
+        <a href="{% url 'home' %}" class="logo" aria-label="NeuroMeet AI home">
+            <span class="logo-mark" aria-hidden="true"></span>
+            <span class="logo-text">NeuroMeet<span class="logo-accent">AI</span></span>
+        </a>
+    </div>
+    <div class="auth-container">
+        <aside class="auth-brand">
+            <div class="auth-brand-card">
+                <div class="auth-brand-logo">
+                    <span class="auth-brand-mark"><i class="fas fa-plus"></i></span>
+                    <span>NeuroMeetAI</span>
+                </div>
+                <h2 class="auth-brand-title">Start your AI‑powered workspace</h2>
+                <p class="auth-brand-subtitle">
+                    Create your account to unlock smart summaries, live notes,
+                    and seamless team follow‑ups in minutes.
+                </p>
+            </div>
+        </aside>
+        <div class="auth-card">
+            <div class="auth-toplogo">
+               
+            </div>
+            <div class="auth-header">
+                <!-- NeuroMeet Logo -->
+                <div class="auth-logo">
+                    <svg viewBox="0 0 32 32" aria-hidden="true">
+                        <!-- Gradient definition -->
+                        <defs>
+                            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#1B4D3E;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#2E6B58;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <!-- Outer circle with gradient -->
+                        <circle class="logo-circle" cx="16" cy="16" r="14" fill="url(#logoGradient)" stroke="currentColor" stroke-width="2"/>
+                        <!-- Cross lines -->
+                        <path class="logo-lines" d="M8 16 L24 16 M16 8 L16 24" stroke="white" stroke-width="2.5"/>
+                        <!-- Center dot with sand accent -->
+                        <circle class="logo-dot" cx="16" cy="16" r="4" fill="#D4A373"/>
+                    </svg>
+                </div>
+                <h1>Create your account</h1>
+                <p class="auth-subtitle">Get started with NeuroMeet AI in minutes</p>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="signup-progress">
+                <div class="progress-step active" id="step1">
+                    <span class="step-number">1</span>
+                    <i class="fas fa-check step-check" style="display: none;"></i>
+                    <span class="step-label">Account</span>
+                </div>
+                <div class="progress-step" id="step2">
+                    <span class="step-number">2</span>
+                    <i class="fas fa-check step-check" style="display: none;"></i>
+                    <span class="step-label">Password</span>
+                </div>
+                <div class="progress-step" id="step3">
+                    <span class="step-number">3</span>
+                    <i class="fas fa-check step-check" style="display: none;"></i>
+                    <span class="step-label">Preferences</span>
+                </div>
+            </div>
+
+            <!-- Django Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="{% if message.tags == 'success' %}success-message{% else %}error-message{% endif %}">
+                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Signup Form -->
+            <form method="post" class="auth-form" id="signupForm" novalidate>
+                {% csrf_token %}
+
+                <!-- Step 1: Basic Info -->
+                <div class="form-step active" id="step1-form">
+                    <div class="auth-field">
+                        <span>Full Name</span>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" 
+                                   name="full_name" 
+                                   id="fullname"
+                                   placeholder="John Doe" 
+                                   value="{{ form.full_name.value|default:'' }}"
+                                   class="{% if form.full_name.errors %}is-invalid{% endif %}"
+                                   required>
+                        </div>
+                        {% if form.full_name.errors %}
+                            <div class="field-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ form.full_name.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="auth-field">
+                        <span>Email Address</span>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" 
+                                   name="email" 
+                                   id="email"
+                                   placeholder="you@company.com" 
+                                   value="{{ form.email.value|default:'' }}"
+                                   class="{% if form.email.errors %}is-invalid{% endif %}"
+                                   required>
+                        </div>
+                        {% if form.email.errors %}
+                            <div class="field-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ form.email.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Step 2: Password -->
+                <div class="form-step" id="step2-form">
+                    <div class="auth-field">
+                        <span>Password</span>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" 
+                                   name="password" 
+                                   id="password"
+                                   placeholder="Create a strong password" 
+                                   class="{% if form.password.errors %}is-invalid{% endif %}"
+                                   required>
+                            <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+
+                        <!-- Password Strength -->
+                        <div class="password-strength">
+                            <div class="strength-bar">
+                                <div class="strength-fill" id="strengthFill"></div>
+                            </div>
+                            <div class="strength-text" id="strengthText">
+                                <i class="fas fa-shield-alt"></i>
+                                Enter a strong password
+                            </div>
+                            
+                            <ul class="requirements-list">
+                                <li id="req-length" class="invalid">
+                                    <i class="fas fa-times"></i> 8+ characters
+                                </li>
+                                <li id="req-uppercase" class="invalid">
+                                    <i class="fas fa-times"></i> Uppercase
+                                </li>
+                                <li id="req-lowercase" class="invalid">
+                                    <i class="fas fa-times"></i> Lowercase
+                                </li>
+                                <li id="req-number" class="invalid">
+                                    <i class="fas fa-times"></i> Number
+                                </li>
+                                <li id="req-special" class="invalid">
+                                    <i class="fas fa-times"></i> Special char
+                                </li>
+                            </ul>
+                        </div>
+                        {% if form.password.errors %}
+                            <div class="field-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ form.password.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="auth-field">
+                        <span>Confirm Password</span>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" 
+                                   name="confirm_password" 
+                                   id="confirm_password"
+                                   placeholder="Re-enter your password" 
+                                   required>
+                            <button type="button" class="password-toggle" onclick="togglePassword('confirm_password')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="password-match" id="passwordMatch"></div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Preferences -->
+                <div class="form-step" id="step3-form">
+                    <div class="auth-field">
+                        <span>Job Title</span>
+                        <div class="input-wrapper">
+                            <i class="fas fa-briefcase input-icon"></i>
+                            <input type="text" 
+                                   name="job_title" 
+                                   id="job_title"
+                                   placeholder="e.g., Product Manager" 
+                                   value="{{ form.job_title.value|default:'' }}">
+                        </div>
+                    </div>
+
+                    <div class="auth-field">
+                        <span>Company (Optional)</span>
+                        <div class="input-wrapper">
+                            <i class="fas fa-building input-icon"></i>
+                            <input type="text" 
+                                   name="company" 
+                                   id="company"
+                                   placeholder="Your company name" 
+                                   value="{{ form.company.value|default:'' }}">
+                        </div>
+                    </div>
+
+                    <div class="auth-field">
+                        <span>How did you hear about us?</span>
+                        <div class="input-wrapper">
+                            <select name="referral_source" id="referral_source">
+                                <option value="">Select an option</option>
+                                <option value="search">Search Engine</option>
+                                <option value="social">Social Media</option>
+                                <option value="friend">Friend Referral</option>
+                                <option value="ad">Advertisement</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="auth-field">
+                        <span>Features interested in:</span>
+                        <div class="features-grid">
+                            <label class="feature-checkbox">
+                                <input type="checkbox" name="features" value="video" checked>
+                                <span>Video Meetings</span>
+                            </label>
+                            <label class="feature-checkbox">
+                                <input type="checkbox" name="features" value="ai" checked>
+                                <span>AI Summaries</span>
+                            </label>
+                            <label class="feature-checkbox">
+                                <input type="checkbox" name="features" value="transcription">
+                                <span>Transcription</span>
+                            </label>
+                            <label class="feature-checkbox">
+                                <input type="checkbox" name="features" value="recording">
+                                <span>Recording</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <label class="terms-checkbox">
+                        <input type="checkbox" name="terms" id="terms" required>
+                        <span>I agree to the <a href="{% url 'terms' %}" target="_blank">Terms of Service</a> and <a href="{% url 'privacy' %}" target="_blank">Privacy Policy</a></span>
+                    </label>
+
+                    <label class="terms-checkbox">
+                        <input type="checkbox" name="newsletter" id="newsletter" checked>
+                        <span>Send me product updates and newsletters (optional)</span>
+                    </label>
+                </div>
+
+                <!-- Form Navigation -->
+                <div class="form-navigation">
+                    <button type="button" class="btn-prev" id="prevBtn" onclick="prevStep()" disabled>
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button type="button" class="btn-next" id="nextBtn" onclick="nextStep()">
+                        Continue <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button type="submit" class="auth-submit" id="submitBtn" style="display: none;">
+                        <span class="btn-text">Create Account</span>
+                        <span class="btn-spinner" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i> Creating...
+                        </span>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Social Signup -->
+            {% url 'social:begin' 'google-oauth2' as google_oauth_url %}
+            {% url 'social:begin' 'github' as github_oauth_url %}
+            <div class="social-signup">
+                <p>Or sign up with</p>
+                <div class="social-buttons">
+                    {% if google_oauth_url %}
+                    <a href="{{ google_oauth_url }}" class="social-btn google">
+                        <i class="fab fa-google"></i>
+                        <span>Google</span>
+                    </a>
+                    {% else %}
+                    <a href="#" class="social-btn google disabled" aria-disabled="true" tabindex="-1" title="Google sign-in is not configured" onclick="return false;">
+                        <i class="fab fa-google"></i>
+                        <span>Google</span>
+                    </a>
+                    {% endif %}
+
+                    {% if github_oauth_url %}
+                    <a href="{{ github_oauth_url }}" class="social-btn github">
+                        <i class="fab fa-github"></i>
+                        <span>GitHub</span>
+                    </a>
+                    {% else %}
+                    <a href="#" class="social-btn github disabled" aria-disabled="true" tabindex="-1" title="GitHub sign-in is not configured" onclick="return false;">
+                        <i class="fab fa-github"></i>
+                        <span>GitHub</span>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Login Link -->
+            <div class="auth-footer">
+                <p>Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    let currentStep = 1;
+    const totalSteps = 3;
+
+    // Toggle password visibility
+    function togglePassword(fieldId) {
+        const field = document.getElementById(fieldId);
+        const icon = event.currentTarget.querySelector('i');
+        
+        if (field.type === 'password') {
+            field.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            field.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+
+    // Navigation functions
+    function nextStep() {
+        if (currentStep < totalSteps && validateStep(currentStep)) {
+            // Update progress bar
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            document.getElementById(`step${currentStep}`).classList.add('completed');
+            document.getElementById(`step${currentStep}`).querySelector('.step-number').style.display = 'none';
+            document.getElementById(`step${currentStep}`).querySelector('.step-check').style.display = 'block';
+            
+            currentStep++;
+            
+            document.getElementById(`step${currentStep}`).classList.add('active');
+            
+            // Show/hide form steps
+            document.querySelectorAll('.form-step').forEach(step => step.classList.remove('active'));
+            document.getElementById(`step${currentStep}-form`).classList.add('active');
+            
+            // Update buttons
+            document.getElementById('prevBtn').disabled = false;
+            
+            if (currentStep === totalSteps) {
+                document.getElementById('nextBtn').style.display = 'none';
+                document.getElementById('submitBtn').style.display = 'block';
+            }
+        }
+    }
+
+    function prevStep() {
+        if (currentStep > 1) {
+            // Update progress bar
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            
+            currentStep--;
+            
+            document.getElementById(`step${currentStep}`).classList.remove('completed');
+            document.getElementById(`step${currentStep}`).classList.add('active');
+            document.getElementById(`step${currentStep}`).querySelector('.step-number').style.display = 'block';
+            document.getElementById(`step${currentStep}`).querySelector('.step-check').style.display = 'none';
+            
+            // Show/hide form steps
+            document.querySelectorAll('.form-step').forEach(step => step.classList.remove('active'));
+            document.getElementById(`step${currentStep}-form`).classList.add('active');
+            
+            // Update buttons
+            document.getElementById('nextBtn').style.display = 'block';
+            document.getElementById('submitBtn').style.display = 'none';
+            
+            if (currentStep === 1) {
+                document.getElementById('prevBtn').disabled = true;
+            }
+        }
+    }
+
+    // Validate each step
+    function validateStep(step) {
+        switch(step) {
+            case 1:
+                const fullname = document.getElementById('fullname').value;
+                const email = document.getElementById('email').value;
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                
+                if (!fullname.trim()) {
+                    showToast('Please enter your full name', 'error');
+                    return false;
+                }
+                if (!email || !emailPattern.test(email)) {
+                    showToast('Please enter a valid email address', 'error');
+                    return false;
+                }
+                return true;
+                
+            case 2:
+                const password = document.getElementById('password').value;
+                const confirm = document.getElementById('confirm_password').value;
+                
+                if (!password) {
+                    showToast('Please enter a password', 'error');
+                    return false;
+                }
+                if (password !== confirm) {
+                    showToast('Passwords do not match', 'error');
+                    return false;
+                }
+                if (!validatePasswordStrength(password)) {
+                    showToast('Please meet all password requirements', 'error');
+                    return false;
+                }
+                return true;
+                
+            default:
+                return true;
+        }
+    }
+
+    // Password strength validation
+    function validatePasswordStrength(password) {
+        const requirements = {
+            length: password.length >= 8,
+            uppercase: /[A-Z]/.test(password),
+            lowercase: /[a-z]/.test(password),
+            number: /[0-9]/.test(password),
+            special: /[!@#$%^&*]/.test(password)
+        };
+        
+        // Update requirement icons
+        document.getElementById('req-length').innerHTML = `<i class="fas fa-${requirements.length ? 'check' : 'times'}"></i> 8+ characters`;
+        document.getElementById('req-uppercase').innerHTML = `<i class="fas fa-${requirements.uppercase ? 'check' : 'times'}"></i> Uppercase`;
+        document.getElementById('req-lowercase').innerHTML = `<i class="fas fa-${requirements.lowercase ? 'check' : 'times'}"></i> Lowercase`;
+        document.getElementById('req-number').innerHTML = `<i class="fas fa-${requirements.number ? 'check' : 'times'}"></i> Number`;
+        document.getElementById('req-special').innerHTML = `<i class="fas fa-${requirements.special ? 'check' : 'times'}"></i> Special char`;
+        
+        // Update classes
+        document.getElementById('req-length').className = requirements.length ? 'valid' : 'invalid';
+        document.getElementById('req-uppercase').className = requirements.uppercase ? 'valid' : 'invalid';
+        document.getElementById('req-lowercase').className = requirements.lowercase ? 'valid' : 'invalid';
+        document.getElementById('req-number').className = requirements.number ? 'valid' : 'invalid';
+        document.getElementById('req-special').className = requirements.special ? 'valid' : 'invalid';
+        
+        return Object.values(requirements).every(Boolean);
+    }
+
+    // Password strength meter
+    document.getElementById('password').addEventListener('input', function() {
+        const password = this.value;
+        let strength = 0;
+        
+        if (password.length >= 8) strength++;
+        if (/[a-z]/.test(password)) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/[0-9]/.test(password)) strength++;
+        if (/[!@#$%^&*]/.test(password)) strength++;
+        
+        const strengthFill = document.getElementById('strengthFill');
+        const strengthText = document.getElementById('strengthText');
+        
+        const width = (strength / 5) * 100;
+        strengthFill.style.width = width + '%';
+        
+        if (strength <= 2) {
+            strengthFill.style.background = '#C76A6A';
+            strengthText.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Weak password';
+        } else if (strength <= 4) {
+            strengthFill.style.background = '#E6B17E';
+            strengthText.innerHTML = '<i class="fas fa-shield-alt"></i> Medium password';
+        } else {
+            strengthFill.style.background = '#1B4D3E';
+            strengthText.innerHTML = '<i class="fas fa-shield-check"></i> Strong password';
+        }
+        
+        validatePasswordStrength(password);
+    });
+
+    // Confirm password match
+    document.getElementById('confirm_password').addEventListener('input', function() {
+        const password = document.getElementById('password').value;
+        const confirm = this.value;
+        const matchIndicator = document.getElementById('passwordMatch');
+        
+        if (confirm) {
+            if (password === confirm) {
+                matchIndicator.innerHTML = '<i class="fas fa-check-circle" style="color: #1B4D3E;"></i> <span style="color: #1B4D3E;">Passwords match</span>';
+                this.classList.add('is-valid');
+                this.classList.remove('is-invalid');
+            } else {
+                matchIndicator.innerHTML = '<i class="fas fa-exclamation-circle" style="color: #C76A6A;"></i> <span style="color: #C76A6A;">Passwords do not match</span>';
+                this.classList.add('is-invalid');
+                this.classList.remove('is-valid');
+            }
+        } else {
+            matchIndicator.innerHTML = '';
+            this.classList.remove('is-valid', 'is-invalid');
+        }
+    });
+
+    // Email validation
+    document.getElementById('email').addEventListener('blur', function() {
+        const email = this.value;
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if (email && !emailPattern.test(email)) {
+            this.classList.add('is-invalid');
+            showToast('Please enter a valid email address', 'error');
+        } else {
+            this.classList.remove('is-invalid');
+        }
+    });
+
+    // Form submission
+    document.getElementById('signupForm').addEventListener('submit', function(e) {
+        if (!document.getElementById('terms').checked) {
+            e.preventDefault();
+            showToast('Please agree to the Terms of Service', 'error');
+            return;
+        }
+        
+        if (!validateStep(2)) {
+            e.preventDefault();
+            return;
+        }
+        
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = submitBtn.querySelector('.btn-text');
+        const btnSpinner = submitBtn.querySelector('.btn-spinner');
+        
+        submitBtn.disabled = true;
+        btnText.style.display = 'none';
+        btnSpinner.style.display = 'inline-block';
+    });
+
+    // Toast notification
+    function showToast(message, type = 'info') {
+        let container = document.getElementById('toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'toast-container';
+            container.style.position = 'fixed';
+            container.style.top = '20px';
+            container.style.right = '20px';
+            container.style.zIndex = '9999';
+            document.body.appendChild(container);
+        }
+
+        const toast = document.createElement('div');
+        toast.className = `toast-notification toast-${type}`;
+        toast.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            <span>${message}</span>
+        `;
+        
+        toast.style.background = type === 'success' ? '#1B4D3E' : '#C76A6A';
+        toast.style.color = 'white';
+        toast.style.padding = '1rem';
+        toast.style.borderRadius = '8px';
+        toast.style.marginBottom = '0.5rem';
+        toast.style.boxShadow = '0 4px 15px rgba(27, 77, 62, 0.2)';
+        toast.style.display = 'flex';
+        toast.style.alignItems = 'center';
+        toast.style.gap = '0.5rem';
+        toast.style.animation = 'slideIn 0.3s ease';
+        
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // Add animation styles
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Auto-focus first field
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('fullname').focus();
+    });
+
+    // Handle Enter key
+    document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (currentStep < totalSteps) {
+                    nextStep();
+                } else {
+                    document.getElementById('signupForm').dispatchEvent(new Event('submit'));
+                }
+            }
+        });
+    });
+
+    // Demo prefill (for development)
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        document.getElementById('fullname').value = 'Demo User';
+        document.getElementById('email').value = 'demo@neuromeet.ai';
+        document.getElementById('password').value = 'Demo@123';
+        document.getElementById('confirm_password').value = 'Demo@123';
+        document.getElementById('job_title').value = 'Product Manager';
+        document.getElementById('company').value = 'Demo Company';
+    }
+</script>
+{% endblock %}

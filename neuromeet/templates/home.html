@@ -1,0 +1,1153 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NeuroMeet AI - Video meetings with AI assistance{% endblock %}
+
+{% block meta_description %}Secure, easy-to-use video meetings with AI-powered transcription and summaries. Get a link, share it, and meet.{% endblock %}
+
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block extra_css %}
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Material Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<!-- Toastr for notifications -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html, body {
+        min-height: 100%;
+        background: #fff;
+    }
+
+    body {
+        font-family: 'Google Sans', sans-serif;
+        background: #fff;
+        color: #202124;
+        line-height: 1.5;
+    }
+
+    #mainHeader {
+        display: none;
+    }
+
+    /* Simple Navigation */
+    .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 24px;
+        border-bottom: 1px solid #e0e0e0;
+        background: white;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .nav-left {
+        display: flex;
+        align-items: center;
+    }
+
+    .home-logo {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        text-decoration: none;
+        color: #1B4D3E;
+    }
+
+    .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .nav-right a {
+        color: #5f6368;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        padding: 8px 12px;
+        border-radius: 20px;
+        transition: all 0.3s;
+    }
+
+    .nav-right a:hover {
+        color: #1B4D3E;
+        background: #f1f3f4;
+    }
+
+    .nav-right .material-icons {
+        color: #5f6368;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 50%;
+        transition: all 0.3s;
+    }
+
+    .nav-right .material-icons:hover {
+        background: #f1f3f4;
+    }
+
+    .home-profile-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        background: transparent !important;
+    }
+
+    .home-profile-link:hover {
+        background: transparent !important;
+    }
+
+    .home-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #1B4D3E;
+        display: block;
+    }
+
+    .home-avatar-fallback {
+        font-size: 36px !important;
+        line-height: 1;
+        color: #5f6368;
+        padding: 0 !important;
+    }
+
+    /* Main Container */
+    .meet-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 24px;
+    }
+
+    /* Hero Section - Simple Two Column */
+    .hero-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 48px;
+        align-items: center;
+        margin-bottom: 60px;
+    }
+
+    .hero-left h1 {
+        font-size: 44px;
+        font-weight: 600;
+        line-height: 1.2;
+        color: #1B4D3E;
+        margin-bottom: 16px;
+    }
+
+    .hero-left p {
+        font-size: 18px;
+        color: #5f6368;
+        margin-bottom: 32px;
+    }
+
+    /* Meeting Controls */
+    .meeting-controls {
+        background: white;
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border: 1px solid #e0e0e0;
+        max-width: 400px;
+    }
+
+    .new-meeting-btn {
+        background: #1B4D3E;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 40px;
+        font-size: 16px;
+        font-weight: 500;
+        font-family: 'Google Sans', sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        width: 100%;
+        margin-bottom: 20px;
+        transition: background 0.2s;
+    }
+
+    .new-meeting-btn:hover {
+        background: #0E3529;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(27, 77, 62, 0.2);
+    }
+
+    .new-meeting-btn .material-icons {
+        font-size: 20px;
+    }
+
+    .join-section {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .code-input {
+        flex: 1;
+        padding: 12px 16px;
+        border: 1px solid #e0e0e0;
+        border-radius: 40px;
+        font-size: 14px;
+        font-family: 'Google Sans', sans-serif;
+        transition: all 0.3s;
+    }
+
+    .code-input:focus {
+        outline: none;
+        border-color: #1B4D3E;
+        box-shadow: 0 0 0 3px rgba(27, 77, 62, 0.1);
+    }
+
+    .join-btn {
+        background: transparent;
+        color: #1B4D3E;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 40px;
+        font-size: 15px;
+        font-weight: 500;
+        font-family: 'Google Sans', sans-serif;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .join-btn:hover:not(:disabled) {
+        background: #f1f3f4;
+    }
+
+    .join-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .divider {
+        text-align: center;
+        margin: 16px 0;
+        color: #9aa0a6;
+        font-size: 14px;
+        position: relative;
+    }
+
+    .divider::before,
+    .divider::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        width: 45%;
+        height: 1px;
+        background: #e0e0e0;
+    }
+
+    .divider::before { left: 0; }
+    .divider::after { right: 0; }
+
+    .learn-more {
+        text-align: center;
+        margin-top: 16px;
+    }
+
+    .learn-more a {
+        color: #1B4D3E;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        padding: 8px 16px;
+        border-radius: 20px;
+        transition: all 0.3s;
+        display: inline-block;
+    }
+
+    .learn-more a:hover {
+        background: #f1f3f4;
+    }
+
+    /* Hero Right - Simple Illustration */
+    .hero-right {
+        display: flex;
+        justify-content: center;
+    }
+
+    .illustration-box {
+        width: 100%;
+        max-width: 450px;
+        height: 330px;
+        background: linear-gradient(135deg, #1B4D3E10, #2E6B5810);
+        border-radius: 20px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #1B4D3E20;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .illustration-box:hover {
+        transform: scale(1.02);
+        box-shadow: 0 20px 40px rgba(27, 77, 62, 0.1);
+    }
+
+    .illustration-inner {
+        position: absolute;
+        inset: 18px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        padding: 18px;
+        transition: all 0.3s;
+    }
+
+    .illustration-box:hover .illustration-inner {
+        transform: translateY(-2px);
+    }
+
+    .illustration-header {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    .illustration-avatar {
+        width: 32px;
+        height: 32px;
+        background: #1B4D3E;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+
+    .illustration-avatar:nth-child(2) { 
+        background: #2E6B58; 
+        animation-delay: 0.3s;
+    }
+    .illustration-avatar:nth-child(3) { 
+        background: #D4A373;
+        animation-delay: 0.6s;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+
+    .illustration-line {
+        height: 8px;
+        background: #f1f3f4;
+        border-radius: 4px;
+        margin-bottom: 12px;
+        animation: slideIn 0.5s ease-out;
+    }
+
+    .illustration-line:nth-of-type(1) { 
+        width: 90%;
+        animation-delay: 0.1s;
+    }
+    .illustration-line:nth-of-type(2) { 
+        width: 75%;
+        animation-delay: 0.2s;
+    }
+    .illustration-line:nth-of-type(3) { 
+        width: 60%;
+        animation-delay: 0.3s;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(-20px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    .summary-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 6px 0 10px;
+    }
+
+    .summary-chip {
+        background: #eef3f2;
+        color: #1B4D3E;
+        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-weight: 500;
+    }
+
+    .summary-chip.accent {
+        background: #1B4D3E;
+        color: white;
+    }
+
+    .summary-bar {
+        height: 6px;
+        background: #e9ecef;
+        border-radius: 999px;
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+
+    .summary-bar span {
+        display: block;
+        height: 100%;
+        width: 72%;
+        background: linear-gradient(90deg, #1B4D3E, #2E6B58);
+        border-radius: 999px;
+    }
+
+    .action-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 6px;
+    }
+
+    .action-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: #5f6368;
+    }
+
+    .action-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #2E6B58;
+        flex: 0 0 auto;
+    }
+
+    .ai-indicator {
+        margin-top: 10px;
+        padding: 8px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        animation: fadeIn 1s;
+    }
+
+    .ai-indicator span {
+        color: #1B4D3E;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .ai-indicator .material-icons {
+        font-size: 16px;
+        color: #1B4D3E;
+        animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    /* Features Grid - Simple Cards */
+    .features-section {
+        margin: 60px 0;
+    }
+
+    .features-section h2 {
+        font-size: 24px;
+        font-weight: 500;
+        color: #202124;
+        margin-bottom: 24px;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    .feature-card {
+        padding: 20px;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        transition: all 0.3s;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .feature-card:hover {
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        transform: translateY(-4px);
+        border-color: #1B4D3E;
+    }
+
+    .feature-icon {
+        width: 48px;
+        height: 48px;
+        background: #1B4D3E10;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+        transition: all 0.3s;
+    }
+
+    .feature-card:hover .feature-icon {
+        background: #1B4D3E20;
+        transform: scale(1.1);
+    }
+
+    .feature-icon .material-icons {
+        color: #1B4D3E;
+        font-size: 24px;
+    }
+
+    .feature-card h3 {
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: #202124;
+    }
+
+    .feature-card p {
+        font-size: 14px;
+        color: #5f6368;
+        line-height: 1.5;
+    }
+
+    /* AI Features Highlight */
+    .ai-badge {
+        display: inline-block;
+        background: #1B4D3E;
+        color: white;
+        font-size: 12px;
+        padding: 4px 8px;
+        border-radius: 40px;
+        margin-left: 8px;
+        vertical-align: middle;
+        animation: pulse 2s infinite;
+    }
+
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 10% auto;
+        padding: 30px;
+        border-radius: 20px;
+        max-width: 500px;
+        position: relative;
+        animation: slideDown 0.3s;
+    }
+
+    @keyframes slideDown {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .close {
+        position: absolute;
+        right: 20px;
+        top: 15px;
+        color: #aaa;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .close:hover {
+        color: #1B4D3E;
+        transform: scale(1.1);
+    }
+
+    .modal h2 {
+        color: #1B4D3E;
+        margin-bottom: 20px;
+    }
+
+    .modal p {
+        color: #5f6368;
+        margin-bottom: 20px;
+        line-height: 1.6;
+    }
+
+    .modal ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .modal ul li {
+        padding: 10px 0;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .modal ul li .material-icons {
+        color: #1B4D3E;
+    }
+
+    /* Loading Spinner */
+    .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #1B4D3E;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+        .hero-section {
+            grid-template-columns: 1fr;
+            gap: 32px;
+        }
+
+        .meeting-controls {
+            max-width: 100%;
+        }
+
+        .features-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 600px) {
+        .nav {
+            padding: 12px 16px;
+        }
+
+        .nav-right a {
+            display: none;
+        }
+
+        .hero-left h1 {
+            font-size: 32px;
+        }
+
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Simple Navigation with all links working -->
+<div class="nav">
+<div class="nav-left">
+    <a href="{% url 'home' %}" class="logo home-logo" aria-label="NeuroMeet AI home">
+        <span class="logo-mark" aria-hidden="true"></span>
+        <span class="logo-text">NeuroMeet<span class="logo-accent">AI</span></span>
+    </a>
+</div>
+    <div class="nav-right">
+        <a href="#" onclick="showSection('overview'); return false;">Overview</a>
+        <a href="#" onclick="showSection('plans'); return false;">Plans</a>
+        <a href="#" onclick="showSection('security'); return false;">Security</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'profile' %}" class="home-profile-link" aria-label="Profile">
+                {% if user.profile.avatar %}
+                    <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" class="home-avatar">
+                {% else %}
+                    <span class="material-icons home-avatar-fallback" aria-hidden="true">account_circle</span>
+                {% endif %}
+            </a>
+        {% else %}
+            <a href="{% url 'login' %}" style="color: #1B4D3E;">Sign in</a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Main Container -->
+<div class="meet-container">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="hero-left">
+            <h1>
+                Video meetings, now with AI
+                <span class="ai-badge" id="betaBadge">BETA</span>
+            </h1>
+            <p>Get a link you can share. Meet securely with AI-powered transcription, summaries, and action items.</p>
+            
+            <!-- Meeting Controls - Fully Functional -->
+            <div class="meeting-controls">
+                <button class="new-meeting-btn" onclick="createNewMeeting()" id="newMeetingBtn">
+                    <span class="material-icons">video_call</span>
+                    New meeting
+                </button>
+                
+                <div class="join-section">
+                    <input type="text" class="code-input" placeholder="Enter a code or link" id="meetingCode" oninput="validateJoinButton()">
+                    <button class="join-btn" onclick="joinMeeting()" id="joinBtn" disabled>Join</button>
+                </div>
+                
+                <div class="divider">or</div>
+                
+                <div class="learn-more">
+                    <a href="#" onclick="showLearnMore(); return false;">Learn more about NeuroMeet AI</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="hero-right">
+            <div class="illustration-box" onclick="showAIDemo()">
+                <div class="illustration-inner">
+                    <div class="illustration-header">
+                        <div class="illustration-avatar"></div>
+                        <div class="illustration-avatar"></div>
+                        <div class="illustration-avatar"></div>
+                    </div>
+                    <div class="illustration-line"></div>
+                    <div class="illustration-line"></div>
+                    <div class="illustration-line"></div>
+                    <div class="summary-row">
+                        <span class="summary-chip">Q2 review</span>
+                        <span class="summary-chip accent">3 action items</span>
+                    </div>
+                    <div class="summary-bar"><span></span></div>
+                    <div class="action-list">
+                        <div class="action-item"><span class="action-dot"></span>Follow up on engagement</div>
+                        <div class="action-item"><span class="action-dot"></span>Share summary with team</div>
+                    </div>
+                    <div class="ai-indicator" id="aiIndicator">
+                        <span>
+                            <span class="material-icons">auto_awesome</span>
+                            AI: Processing meeting...
+                        </span>
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Grid - All Cards Clickable -->
+    <div class="features-section">
+        <h2>Everything you need, nothing extra</h2>
+        <div class="features-grid">
+            <a href="#" class="feature-card" onclick="showFeatureDetail('simple'); return false;">
+                <div class="feature-icon">
+                    <span class="material-icons">share</span>
+                </div>
+                <h3>Simple to use</h3>
+                <p>Share a link. No downloads required. Join from any device.</p>
+            </a>
+            
+            <a href="#" class="feature-card" onclick="showFeatureDetail('secure'); return false;">
+                <div class="feature-icon">
+                    <span class="material-icons">shield</span>
+                </div>
+                <h3>Secure by design</h3>
+                <p>End-to-end encrypted meetings. Your conversations stay private.</p>
+            </a>
+            
+            <a href="#" class="feature-card" onclick="showFeatureDetail('ai'); return false;">
+                <div class="feature-icon">
+                    <span class="material-icons">auto_awesome</span>
+                </div>
+                <h3>AI-powered</h3>
+                <p>Real-time transcription, smart summaries, and action items.</p>
+            </a>
+            
+            <a href="#" class="feature-card" onclick="showFeatureDetail('noise'); return false;">
+                <div class="feature-icon">
+                    <span class="material-icons">record_voice_over</span>
+                </div>
+                <h3>Noise cancellation</h3>
+                <p>AI removes background noise so you can focus on the conversation.</p>
+            </a>
+            
+            <a href="#" class="feature-card" onclick="showFeatureDetail('actions'); return false;">
+                <div class="feature-icon">
+                    <span class="material-icons">format_list_bulleted</span>
+                </div>
+                <h3>Auto action items</h3>
+                <p>AI detects and captures action items automatically.</p>
+            </a>
+            
+            <a href="#" class="feature-card" onclick="showFeatureDetail('limits'); return false;">
+                <div class="feature-icon">
+                    <span class="material-icons">schedule</span>
+                </div>
+                <h3>No time limits</h3>
+                <p>Free meetings can last as long as you need. No 40-minute limits.</p>
+            </a>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal for various sections -->
+<div id="infoModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div id="modalContent"></div>
+    </div>
+</div>
+
+<!-- Toastr JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script>
+    // Configure toastr
+    toastr.options = {
+        "closeButton": true,
+        "progressBar": true,
+        "positionClass": "toast-top-right",
+        "timeOut": "3000"
+    };
+
+    // AI Demo Animation
+    let aiInterval;
+    function startAIDemo() {
+        const indicator = document.getElementById('aiIndicator');
+        const messages = [
+            'AI: Transcribing meeting...',
+            'AI: Generating summary...',
+            'AI: Detecting action items...',
+            'AI: Summary ready!',
+            'AI: 3 action items found'
+        ];
+        let index = 0;
+        
+        aiInterval = setInterval(() => {
+            const span = indicator.querySelector('span');
+            span.innerHTML = `<span class="material-icons">auto_awesome</span> ${messages[index]}`;
+            index = (index + 1) % messages.length;
+        }, 2000);
+    }
+
+    function stopAIDemo() {
+        if (aiInterval) {
+            clearInterval(aiInterval);
+        }
+    }
+
+    startAIDemo();
+
+    // Validate join button
+    function validateJoinButton() {
+        const input = document.getElementById('meetingCode');
+        const joinBtn = document.getElementById('joinBtn');
+        joinBtn.disabled = !input.value.trim();
+    }
+
+    // Create new meeting
+    function createNewMeeting() {
+        const btn = document.getElementById('newMeetingBtn');
+        btn.innerHTML = '<span class="spinner"></span> Creating...';
+        btn.disabled = true;
+        
+        // Simulate API call
+        setTimeout(() => {
+            const meetingCode = 'meet-' + Math.random().toString(36).substring(2, 8);
+            window.location.href = '/room/' + meetingCode;
+        }, 1500);
+    }
+
+    // Join meeting
+    function joinMeeting() {
+        const code = document.getElementById('meetingCode').value.trim();
+        const joinBtn = document.getElementById('joinBtn');
+        
+        if (!code) {
+            toastr.warning('Please enter a meeting code or link');
+            return;
+        }
+        
+        joinBtn.innerHTML = '<span class="spinner"></span> Joining...';
+        joinBtn.disabled = true;
+        
+        // Simulate validation
+        setTimeout(() => {
+            // If it's a full URL, extract code
+            if (code.includes('neuromeet.ai/') || code.includes('meet.google.com/')) {
+                const parts = code.split('/');
+                const meetingCode = parts[parts.length - 1];
+                window.location.href = '/room/' + meetingCode;
+            } 
+            // If it's just a code
+            else {
+                window.location.href = '/room/' + code;
+            }
+        }, 1000);
+    }
+
+    // Handle Enter key in input
+    document.getElementById('meetingCode').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !document.getElementById('joinBtn').disabled) {
+            joinMeeting();
+        }
+    });
+
+    // Show AI Demo
+    function showAIDemo() {
+        const modal = document.getElementById('infoModal');
+        const content = document.getElementById('modalContent');
+        
+        content.innerHTML = `
+            <h2>AI Meeting Assistant Demo</h2>
+            <p>Watch how NeuroMeet AI transforms your meetings:</p>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 20px 0;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                    <span class="material-icons" style="color: #1B4D3E;">record_voice_over</span>
+                    <span>Real-time transcription</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                    <span class="material-icons" style="color: #1B4D3E;">summarize</span>
+                    <span>Smart meeting summaries</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span class="material-icons" style="color: #1B4D3E;">assignment</span>
+                    <span>Automated action items</span>
+                </div>
+            </div>
+            <button class="new-meeting-btn" onclick="window.location.href='{% url 'room' %}'" style="width: auto;">
+                Try it now
+            </button>
+        `;
+        
+        modal.style.display = 'block';
+    }
+
+    // Show section (Overview, Plans, Security)
+    function showSection(section) {
+        const modal = document.getElementById('infoModal');
+        const content = document.getElementById('modalContent');
+        
+        const sections = {
+            overview: {
+                title: 'Overview',
+                content: 'NeuroMeet AI is the next-generation meeting platform that combines high-quality video calls with artificial intelligence to make your meetings more productive.'
+            },
+            plans: {
+                title: 'Plans & Pricing',
+                content: `
+                    <h3>Free Plan</h3>
+                    <p>✓ Unlimited 1-on-1 meetings<br>✓ 60-minute group meetings<br>✓ AI summaries (5/month)</p>
+                    <h3>Pro Plan - $12/month</h3>
+                    <p>✓ Unlimited meeting duration<br>✓ Unlimited AI summaries<br>✓ Advanced analytics</p>
+                    <h3>Business - $24/month</h3>
+                    <p>✓ Everything in Pro<br>✓ Admin controls<br>✓ SSO integration</p>
+                `
+            },
+            security: {
+                title: 'Security',
+                content: 'End-to-end encryption for all meetings. Your data is protected with enterprise-grade security. Compliant with GDPR, HIPAA, and SOC2.'
+            }
+        };
+        
+        const data = sections[section];
+        content.innerHTML = `<h2>${data.title}</h2><p>${data.content}</p>`;
+        modal.style.display = 'block';
+    }
+
+    // Show feature detail
+    function showFeatureDetail(feature) {
+        const modal = document.getElementById('infoModal');
+        const content = document.getElementById('modalContent');
+        
+        const features = {
+            simple: {
+                title: 'Simple to use',
+                content: 'No downloads, no complicated setup. Just share a link and start meeting from any device - desktop, tablet, or mobile.'
+            },
+            secure: {
+                title: 'Secure by design',
+                content: 'All meetings are end-to-end encrypted. Your conversations are private and secure. We never listen to or store your meeting content.'
+            },
+            ai: {
+                title: 'AI-powered',
+                content: 'Real-time transcription in 30+ languages, smart meeting summaries, and automated action item detection. Never miss important details.'
+            },
+            noise: {
+                title: 'Noise cancellation',
+                content: 'AI-powered noise cancellation removes background noise - barking dogs, keyboard typing, street sounds. Crystal clear audio always.'
+            },
+            actions: {
+                title: 'Auto action items',
+                content: 'AI automatically detects and captures action items during meetings. Assign owners and deadlines with one click.'
+            },
+            limits: {
+                title: 'No time limits',
+                content: 'Unlike other free tools, our free plan has no 40-minute time limits. Meet as long as you need.'
+            }
+        };
+        
+        const data = features[feature];
+        content.innerHTML = `
+            <h2>${data.title}</h2>
+            <p>${data.content}</p>
+            <button class="new-meeting-btn" onclick="window.location.href='{% url 'signup' %}'" style="width: auto; margin-top: 20px;">
+                Try it free
+            </button>
+        `;
+        modal.style.display = 'block';
+    }
+
+    // Learn more
+    function showLearnMore() {
+        const modal = document.getElementById('infoModal');
+        const content = document.getElementById('modalContent');
+        
+        content.innerHTML = `
+            <h2>About NeuroMeet AI</h2>
+            <p>NeuroMeet AI combines the best of video conferencing with artificial intelligence to transform how teams collaborate.</p>
+            <ul style="list-style: none; padding: 0;">
+                <li style="margin: 10px 0;">✓ 100+ countries served</li>
+                <li style="margin: 10px 0;">✓ 50,000+ active teams</li>
+                <li style="margin: 10px 0;">✓ 98% satisfaction rate</li>
+                <li style="margin: 10px 0;">✓ 24/7 customer support</li>
+            </ul>
+            <button class="new-meeting-btn" onclick="window.location.href='{% url 'signup' %}'" style="width: auto; margin-top: 20px;">
+                Get started free
+            </button>
+        `;
+        modal.style.display = 'block';
+    }
+
+    // Footer functions
+    function showAbout() {
+        const modal = document.getElementById('infoModal');
+        const content = document.getElementById('modalContent');
+        
+        content.innerHTML = `
+            <h2>About NeuroMeet AI</h2>
+            <p>Founded in 2023, NeuroMeet AI is on a mission to make meetings more productive through artificial intelligence. We believe that meetings should end with clear actions, not confusion.</p>
+            <p><strong>Our team</strong> consists of AI researchers, video engineers, and collaboration experts from Google, Zoom, and Microsoft.</p>
+        `;
+        modal.style.display = 'block';
+    }
+
+    function showPrivacy() {
+        const modal = document.getElementById('infoModal');
+        const content = document.getElementById('modalContent');
+        
+        content.innerHTML = `
+            <h2>Privacy Policy</h2>
+            <p>We take your privacy seriously. Here's what you need to know:</p>
+            <ul style="list-style: none; padding: 0;">
+                <li style="margin: 10px 0;">✓ We never sell your data</li>
+                <li style="margin: 10px 0;">✓ End-to-end encryption by default</li>
+                <li style="margin: 10px 0;">✓ GDPR compliant</li>
+                <li style="margin: 10px 0;">✓ You control your data</li>
+            </ul>
+        `;
+        modal.style.display = 'block';
+    }
+
+    function showTerms() {
+        const modal = document.getElementById('infoModal');
+        const content = document.getElementById('modalContent');
+        
+        content.innerHTML = `
+            <h2>Terms of Service</h2>
+            <p>By using NeuroMeet AI, you agree to:</p>
+            <ul style="list-style: none; padding: 0;">
+                <li style="margin: 10px 0;">✓ Use the service responsibly</li>
+                <li style="margin: 10px 0;">✓ Respect others' privacy</li>
+                <li style="margin: 10px 0;">✓ Not misuse the platform</li>
+                <li style="margin: 10px 0;">✓ Comply with laws</li>
+            </ul>
+        `;
+        modal.style.display = 'block';
+    }
+
+    function showHelp() {
+        const modal = document.getElementById('infoModal');
+        const content = document.getElementById('modalContent');
+        
+        content.innerHTML = `
+            <h2>Help Center</h2>
+            <p>Need assistance? We're here to help:</p>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                <p><strong>📧 Email:</strong> support@neuromeet.ai</p>
+                <p><strong>📞 Phone:</strong> +1 (800) 123-4567</p>
+                <p><strong>💬 Live chat:</strong> Available 24/7</p>
+            </div>
+            <p>Average response time: &lt; 5 minutes</p>
+        `;
+        modal.style.display = 'block';
+    }
+
+    // Close modal
+    function closeModal() {
+        document.getElementById('infoModal').style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('infoModal');
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    // Beta badge click
+    document.getElementById('betaBadge').addEventListener('click', function() {
+        toastr.info('You\'re using NeuroMeet AI Beta! New features coming soon.');
+    });
+
+    // Initialize on page load
+    window.onload = function() {
+        // Pre-fill meeting code from URL if present
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        if (code) {
+            document.getElementById('meetingCode').value = code;
+            validateJoinButton();
+        }
+    };
+</script>
+{% endblock %}

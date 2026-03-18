@@ -1,0 +1,1140 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NeuroMeet AI | Simple, Transparent Pricing{% endblock %}
+
+{% block meta_description %}Choose the perfect plan for your team. Free forever plan available. No credit card required. AI-powered meetings for everyone.{% endblock %}
+
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block extra_css %}
+<!-- AOS Animation Library -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<!-- Toastr for notifications -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<style>
+    /* ===== DEEP GREEN THEME - EXACTLY LIKE HOME PAGE ===== */
+    :root {
+        --primary: #1B4D3E;        /* Deep Forest Green */
+        --primary-dark: #0E3529;    /* Dark Forest Green */
+        --primary-light: #2E6B58;   /* Medium Forest Green */
+        --secondary: #235B4A;       /* Pine Green */
+        --accent: #D4A373;          /* Warm Sand (accent) */
+        --success: #1B4D3E;         /* Deep Green */
+        --warning: #E6B17E;         /* Warm Peach */
+        --danger: #C76A6A;          /* Soft Red */
+        --dark: #0E3529;            /* Very Dark Green */
+        --dark-light: #1B4D3E;      /* Deep Green */
+        --light: #FFFFFF;           /* Pure White */
+        --gray: #4A5568;
+        --gray-light: #718096;
+        --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        --gradient-accent: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);
+        --shadow-sm: 0 4px 6px -1px rgba(27, 77, 62, 0.1);
+        --shadow-md: 0 10px 15px -3px rgba(27, 77, 62, 0.15);
+        --shadow-lg: 0 20px 25px -5px rgba(27, 77, 62, 0.2);
+        --shadow-xl: 0 25px 50px -12px rgba(27, 77, 62, 0.25);
+        --border-radius: 1rem;
+        --border-radius-sm: 0.5rem;
+        --border-radius-lg: 2rem;
+        --transition: all 0.3s ease;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        color: var(--dark);
+        line-height: 1.6;
+        background: var(--light);
+    }
+
+    .container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    /* White top logo like login page */
+    .auth-topbar .logo,
+    .auth-topbar .logo-text,
+    .auth-topbar .logo-accent {
+        color: #ffffff;
+    }
+
+    .auth-topbar .logo-mark {
+        border-color: rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.12);
+    }
+
+    .auth-topbar .logo-mark::before,
+    .auth-topbar .logo-mark::after {
+        background: #ffffff;
+    }
+
+    /* ===== BUTTONS - EXACTLY LIKE HOME PAGE ===== */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1.25rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border-radius: var(--border-radius-sm);
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+        z-index: -1;
+    }
+
+    .btn:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary {
+        background: var(--gradient-primary);
+        color: white;
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 2px solid var(--primary);
+        color: var(--primary);
+    }
+
+    .btn-outline:hover {
+        background: var(--primary);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn-lg {
+        padding: 0.75rem 1.4rem;
+        font-size: 0.95rem;
+    }
+
+    /* ===== PRICING HERO - MATCHING HOME HERO ===== */
+    .pricing-hero {
+        padding: 120px 0 80px;
+        background: var(--gradient-primary);
+        position: relative;
+        overflow: hidden;
+        color: white;
+    }
+
+    .pricing-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 30% 50%, rgba(212, 163, 115, 0.15) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    .pricing-hero .container {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+    }
+
+    .pricing-hero h1 {
+        font-size: clamp(2.5rem, 5vw, 3.75rem);
+        font-weight: 800;
+        margin-bottom: 1rem;
+        color: white;
+        animation: fadeInUp 0.8s ease;
+    }
+
+    .pricing-hero p {
+        max-width: 600px;
+        margin: 0 auto 2rem;
+        font-size: 1.25rem;
+        color: rgba(255, 255, 255, 0.9);
+        animation: fadeInUp 0.8s ease 0.1s both;
+    }
+
+    .pricing-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        animation: fadeInUp 0.8s ease 0.2s both;
+    }
+
+    .pricing-actions .btn-primary {
+        background: white;
+        color: var(--primary);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .pricing-actions .btn-primary:hover {
+        background: var(--light);
+        transform: translateY(-2px);
+    }
+
+    .pricing-actions .btn-outline {
+        border: 2px solid white;
+        color: white;
+    }
+
+    .pricing-actions .btn-outline:hover {
+        background: white;
+        color: var(--primary);
+    }
+
+    /* ===== BILLING TOGGLE ===== */
+    .billing-section {
+        padding: 40px 0 20px;
+    }
+
+    .billing-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        background: white;
+        padding: 1rem;
+        border-radius: 60px;
+        max-width: 400px;
+        margin: 0 auto;
+        box-shadow: var(--shadow-md);
+        border: 1px solid rgba(27, 77, 62, 0.1);
+    }
+
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 32px;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--gray-light);
+        transition: .4s;
+        border-radius: 34px;
+    }
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 24px;
+        width: 24px;
+        left: 4px;
+        bottom: 4px;
+        background: white;
+        transition: .4s;
+        border-radius: 50%;
+        box-shadow: var(--shadow-sm);
+    }
+
+    input:checked + .toggle-slider {
+        background: var(--gradient-primary);
+    }
+
+    input:checked + .toggle-slider:before {
+        transform: translateX(28px);
+    }
+
+    .save-badge {
+        background: rgba(27, 77, 62, 0.1);
+        color: var(--primary);
+        padding: 4px 12px;
+        border-radius: 40px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-left: 8px;
+    }
+
+    /* ===== PRICING CARDS - MATCHING HOME FEATURE CARDS ===== */
+    .pricing-plans {
+        padding: 40px 0 60px;
+    }
+
+    .pricing-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .pricing-card {
+        background: var(--light);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        border: 1px solid rgba(27, 77, 62, 0.1);
+        box-shadow: var(--shadow-md);
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        position: relative;
+        transition: var(--transition);
+        animation: fadeInUp 0.8s ease;
+        animation-fill-mode: both;
+    }
+
+    .pricing-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-primary);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
+    .pricing-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-xl);
+    }
+
+    .pricing-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .pricing-card.featured {
+        border: 2px solid var(--primary);
+        transform: scale(1.05);
+    }
+
+    .pricing-card.featured:hover {
+        transform: scale(1.05) translateY(-10px);
+    }
+
+    .pricing-card:nth-child(1) { animation-delay: 0.1s; }
+    .pricing-card:nth-child(2) { animation-delay: 0.2s; }
+    .pricing-card:nth-child(3) { animation-delay: 0.3s; }
+
+    .featured-badge {
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--gradient-accent);
+        color: var(--primary-dark);
+        padding: 4px 16px;
+        border-radius: 40px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        box-shadow: var(--shadow-md);
+        animation: pulse 2s infinite;
+        white-space: nowrap;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: translateX(-50%) scale(1); }
+        50% { transform: translateX(-50%) scale(1.05); }
+    }
+
+    .pricing-card h3 {
+        font-size: 1.5rem;
+        margin: 0;
+        color: var(--primary-dark);
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .price-container {
+        margin: 0.5rem 0;
+    }
+
+    .price {
+        font-size: 3rem;
+        font-weight: 800;
+        color: var(--primary-dark);
+        line-height: 1;
+    }
+
+    .price span {
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--gray);
+    }
+
+    .price-period {
+        color: var(--gray);
+        font-size: 0.95rem;
+        margin-top: 4px;
+    }
+
+    .pricing-card p {
+        color: var(--gray);
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
+    .pricing-card ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 0.8rem;
+    }
+
+    .pricing-card li {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        font-size: 0.95rem;
+        color: var(--gray);
+        animation: slideIn 0.3s ease;
+        animation-fill-mode: both;
+    }
+
+    .pricing-card li i {
+        color: var(--primary);
+        font-size: 1.1rem;
+    }
+
+    .pricing-card li.disabled {
+        opacity: 0.5;
+    }
+
+    .pricing-card li.disabled i {
+        color: var(--gray-light);
+    }
+
+    .pricing-card .btn {
+        width: 100%;
+        margin-top: auto;
+    }
+
+    .pricing-note {
+        text-align: center;
+        margin-top: 3rem;
+        color: var(--gray);
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .pricing-note i {
+        color: var(--primary);
+    }
+
+    /* ===== GUARANTEE BADGE ===== */
+    .guarantee-badge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding: 1rem 2rem;
+        background: white;
+        border-radius: 60px;
+        max-width: 450px;
+        margin: 2rem auto 0;
+        box-shadow: var(--shadow-md);
+        border: 1px solid rgba(27, 77, 62, 0.1);
+    }
+
+    .guarantee-badge i {
+        color: var(--primary);
+        font-size: 2rem;
+    }
+
+    .guarantee-text {
+        text-align: left;
+    }
+
+    .guarantee-text strong {
+        color: var(--primary-dark);
+        display: block;
+    }
+
+    .guarantee-text span {
+        color: var(--gray);
+        font-size: 0.9rem;
+    }
+
+    /* ===== COMPARE TABLE ===== */
+    .compare-section {
+        padding: 60px 0;
+        background: var(--light);
+    }
+
+    .compare-section h2 {
+        text-align: center;
+        color: var(--primary-dark);
+        margin-bottom: 2rem;
+        font-size: 2rem;
+    }
+
+    .compare-table {
+        max-width: 900px;
+        margin: 0 auto;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid rgba(27, 77, 62, 0.1);
+    }
+
+    .compare-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        background: white;
+        border-bottom: 1px solid rgba(27, 77, 62, 0.1);
+        transition: var(--transition);
+    }
+
+    .compare-row:last-child {
+        border-bottom: none;
+    }
+
+    .compare-row.header {
+        background: var(--gradient-primary);
+        color: white;
+        font-weight: 600;
+    }
+
+    .compare-row.header .compare-cell {
+        color: white;
+    }
+
+    .compare-cell {
+        padding: 1rem;
+        text-align: center;
+        color: var(--gray);
+    }
+
+    .compare-cell:first-child {
+        text-align: left;
+        padding-left: 2rem;
+        font-weight: 500;
+        color: var(--primary-dark);
+    }
+
+    .compare-cell i {
+        color: var(--primary);
+    }
+
+    /* ===== FAQ SECTION ===== */
+    .pricing-faq {
+        padding: 60px 0 80px;
+        background: var(--light);
+    }
+
+    .faq-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .faq-header h2 {
+        font-size: 2rem;
+        color: var(--primary-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .faq-header p {
+        color: var(--gray);
+    }
+
+    .faq-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .faq-card {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        border: 1px solid rgba(27, 77, 62, 0.1);
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        cursor: pointer;
+    }
+
+    .faq-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary-light);
+    }
+
+    .faq-card h4 {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+        color: var(--primary-dark);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .faq-card h4 i {
+        color: var(--primary);
+        font-size: 1.2rem;
+    }
+
+    .faq-card p {
+        margin: 0;
+        color: var(--gray);
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .faq-answer {
+        display: none;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(27, 77, 62, 0.1);
+    }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .fade-in {
+        animation: fadeInUp 0.8s ease forwards;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+        .container {
+            padding: 0 1.5rem;
+        }
+
+        .pricing-hero {
+            padding: 100px 0 60px;
+        }
+
+        .pricing-hero h1 {
+            font-size: 2rem;
+        }
+
+        .pricing-grid {
+            gap: 1.5rem;
+        }
+
+        .pricing-card.featured {
+            transform: scale(1);
+        }
+
+        .pricing-card.featured:hover {
+            transform: scale(1) translateY(-10px);
+        }
+
+        .compare-row {
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            font-size: 0.85rem;
+        }
+
+        .compare-cell:first-child {
+            padding-left: 0.5rem;
+        }
+
+        .billing-toggle {
+            padding: 0.75rem;
+        }
+
+        .guarantee-badge {
+            flex-direction: column;
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .guarantee-text {
+            text-align: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .pricing-actions {
+            flex-direction: column;
+        }
+
+        .btn-lg {
+            width: 100%;
+        }
+
+        .billing-toggle {
+            flex-direction: column;
+            border-radius: var(--border-radius);
+        }
+    }
+
+    /* Custom scrollbar - matching home page */
+    ::-webkit-scrollbar {
+        width: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: var(--light);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--primary);
+        border-radius: 6px;
+        border: 3px solid var(--light);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-dark);
+    }
+
+    /* Selection color */
+    ::selection {
+        background: var(--primary);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-topbar">
+    <a href="{% url 'home' %}" class="logo" aria-label="NeuroMeet AI home">
+        <span class="logo-mark" aria-hidden="true"></span>
+        <span class="logo-text">NeuroMeet<span class="logo-accent">AI</span></span>
+    </a>
+</div>
+<!-- Hero Section - Matching Home Page -->
+<section class="pricing-hero">
+    <div class="container">
+        <h1 class="fade-in">Simple pricing that grows with your team</h1>
+        <p class="fade-in">Start free, then upgrade when you need advanced analytics, admin controls, and team-wide automation. No credit card required.</p>
+        <div class="pricing-actions">
+            <a href="{% url 'signup' %}" class="btn btn-primary btn-lg">Start free trial</a>
+            <a href="{% url 'contact-sales' %}" class="btn btn-outline btn-lg">Talk to sales</a>
+        </div>
+    </div>
+</section>
+
+<!-- Billing Toggle -->
+<section class="billing-section">
+    <div class="container">
+        <div class="billing-toggle" data-aos="fade-up">
+            <span>Monthly</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="billingToggle" onchange="toggleBilling()">
+                <span class="toggle-slider"></span>
+            </label>
+            <span>Annual <span class="save-badge">Save 20%</span></span>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing Plans -->
+<section class="pricing-plans">
+    <div class="container">
+        <div class="pricing-grid">
+            <!-- Free Plan -->
+            <div class="pricing-card" id="freePlan" data-aos="fade-up" data-aos-delay="100">
+                <h3>
+                    Free
+                    <i class="bi bi-info-circle" style="font-size: 1.2rem; color: var(--gray); cursor: help;" onclick="showInfo('free')"></i>
+                </h3>
+                <div class="price-container">
+                    <div class="price" id="freePrice">$0</div>
+                    <div class="price-period">forever free</div>
+                </div>
+                <p>Perfect for individuals getting started with AI meetings.</p>
+                <ul>
+                    <li><i class="bi bi-check-circle-fill"></i> Unlimited 1:1 meetings</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Real-time transcription</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Basic AI summaries (5/month)</li>
+                </ul>
+                <a href="{% url 'signup' %}" class="btn btn-primary">Get started free</a>
+            </div>
+
+            <!-- Team Plan - Featured -->
+            <div class="pricing-card featured" id="teamPlan" data-aos="fade-up" data-aos-delay="200">
+                <div class="featured-badge">MOST POPULAR</div>
+                <h3>
+                    Team
+                    <i class="bi bi-info-circle" style="font-size: 1.2rem; color: var(--gray); cursor: help;" onclick="showInfo('team')"></i>
+                </h3>
+                <div class="price-container">
+                    <div class="price" id="teamPrice">$12</div>
+                    <div class="price-period" id="teamPeriod">per user/month</div>
+                </div>
+                <p>Best for growing teams who meet often and need AI assistance.</p>
+                <ul>
+                    <li><i class="bi bi-check-circle-fill"></i> Everything in Free</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Unlimited AI summaries</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Shared action items</li>
+                </ul>
+                <a href="{% url 'signup' %}" class="btn btn-primary">Start 14-day trial</a>
+            </div>
+
+            <!-- Business Plan -->
+            <div class="pricing-card" id="businessPlan" data-aos="fade-up" data-aos-delay="300">
+                <h3>
+                    Business
+                    <i class="bi bi-info-circle" style="font-size: 1.2rem; color: var(--gray); cursor: help;" onclick="showInfo('business')"></i>
+                </h3>
+                <div class="price-container">
+                    <div class="price" id="businessPrice">Custom</div>
+                </div>
+                <p>Advanced controls, security, and dedicated support for large teams.</p>
+                <ul>
+                    <li><i class="bi bi-check-circle-fill"></i> Everything in Team</li>
+                    <li><i class="bi bi-check-circle-fill"></i> SSO & SAML</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Dedicated CSM</li>
+                </ul>
+                <a href="{% url 'contact-sales' %}" class="btn btn-outline">Contact sales</a>
+            </div>
+        </div>
+
+        <!-- Trust Badges -->
+        <div class="pricing-note" data-aos="fade-up">
+            <i class="bi bi-shield-check"></i>
+            <span>All plans include GDPR-ready security, 99.9% uptime SLA, and exportable transcripts</span>
+            <i class="bi bi-shield-check"></i>
+        </div>
+
+        <!-- Money-back Guarantee -->
+        <div class="guarantee-badge" data-aos="zoom-in">
+            <i class="bi bi-shield-fill-check"></i>
+            <div class="guarantee-text">
+                <strong>30-day money-back guarantee</strong>
+                <span>No questions asked. Cancel anytime.</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Compare Features -->
+<section class="compare-section">
+    <div class="container">
+        <h2 data-aos="fade-up">Compare plans</h2>
+        <div class="compare-table" data-aos="fade-up" data-aos-delay="100">
+            <div class="compare-row header">
+                <div class="compare-cell">Feature</div>
+                <div class="compare-cell">Free</div>
+                <div class="compare-cell">Team</div>
+                <div class="compare-cell">Business</div>
+            </div>
+            <div class="compare-row">
+                <div class="compare-cell">Meeting duration</div>
+                <div class="compare-cell">60 min</div>
+                <div class="compare-cell">Unlimited</div>
+                <div class="compare-cell">Unlimited</div>
+            </div>
+            <div class="compare-row">
+                <div class="compare-cell">Max participants</div>
+                <div class="compare-cell">100</div>
+                <div class="compare-cell">150</div>
+                <div class="compare-cell">250+</div>
+            </div>
+            <div class="compare-row">
+                <div class="compare-cell">AI summaries</div>
+                <div class="compare-cell">5/month</div>
+                <div class="compare-cell">Unlimited</div>
+                <div class="compare-cell">Unlimited</div>
+            </div>
+            <div class="compare-row">
+                <div class="compare-cell">Recording</div>
+                <div class="compare-cell"><i class="bi bi-check-lg"></i></div>
+                <div class="compare-cell"><i class="bi bi-check-lg"></i></div>
+                <div class="compare-cell"><i class="bi bi-check-lg"></i></div>
+            </div>
+            <div class="compare-row">
+                <div class="compare-cell">Noise cancellation</div>
+                <div class="compare-cell">Basic</div>
+                <div class="compare-cell">Advanced</div>
+                <div class="compare-cell">Advanced</div>
+            </div>
+            <div class="compare-row">
+                <div class="compare-cell">Support</div>
+                <div class="compare-cell">Community</div>
+                <div class="compare-cell">Priority</div>
+                <div class="compare-cell">24/7 dedicated</div>
+            </div>
+            <div class="compare-row">
+                <div class="compare-cell">SSO/SAML</div>
+                <div class="compare-cell"><i class="bi bi-x-lg"></i></div>
+                <div class="compare-cell"><i class="bi bi-x-lg"></i></div>
+                <div class="compare-cell"><i class="bi bi-check-lg"></i></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="pricing-faq">
+    <div class="container">
+        <div class="faq-header" data-aos="fade-up">
+            <h2>Frequently asked questions</h2>
+            <p>Everything you need to know about pricing and plans</p>
+        </div>
+        <div class="faq-grid">
+            <div class="faq-card" onclick="toggleFAQ(this)" data-aos="fade-up" data-aos-delay="100">
+                <h4>
+                    <i class="bi bi-question-circle"></i>
+                    Can I cancel anytime?
+                </h4>
+                <div class="faq-answer">
+                    <p>Yes. You can upgrade, downgrade, or cancel your subscription whenever you want. No questions asked, no hidden fees.</p>
+                </div>
+            </div>
+            <div class="faq-card" onclick="toggleFAQ(this)" data-aos="fade-up" data-aos-delay="150">
+                <h4>
+                    <i class="bi bi-question-circle"></i>
+                    Do you offer annual discounts?
+                </h4>
+                <div class="faq-answer">
+                    <p>Yes! Annual plans include 20% savings compared to monthly billing. Use the toggle above to see annual pricing.</p>
+                </div>
+            </div>
+            <div class="faq-card" onclick="toggleFAQ(this)" data-aos="fade-up" data-aos-delay="200">
+                <h4>
+                    <i class="bi bi-question-circle"></i>
+                    Is my data secure?
+                </h4>
+                <div class="faq-answer">
+                    <p>We use end-to-end encryption for all meetings. Your data is encrypted in transit and at rest. We're GDPR and SOC2 compliant.</p>
+                </div>
+            </div>
+            <div class="faq-card" onclick="toggleFAQ(this)" data-aos="fade-up" data-aos-delay="250">
+                <h4>
+                    <i class="bi bi-question-circle"></i>
+                    What payment methods do you accept?
+                </h4>
+                <div class="faq-answer">
+                    <p>We accept all major credit cards, PayPal, and bank transfers for annual plans. Invoicing available for Business plans.</p>
+                </div>
+            </div>
+            <div class="faq-card" onclick="toggleFAQ(this)" data-aos="fade-up" data-aos-delay="300">
+                <h4>
+                    <i class="bi bi-question-circle"></i>
+                    Can I switch plans later?
+                </h4>
+                <div class="faq-answer">
+                    <p>Absolutely! You can upgrade or downgrade at any time. Changes are prorated for the remainder of your billing cycle.</p>
+                </div>
+            </div>
+            <div class="faq-card" onclick="toggleFAQ(this)" data-aos="fade-up" data-aos-delay="350">
+                <h4>
+                    <i class="bi bi-question-circle"></i>
+                    Do you have a free trial?
+                </h4>
+                <div class="faq-answer">
+                    <p>Yes! Team plans come with a 14-day free trial. No credit card required. You can cancel anytime during the trial.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- AOS JS -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<!-- Toastr JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script>
+    // Initialize AOS
+    AOS.init({
+        duration: 800,
+        once: true,
+        offset: 100,
+        easing: 'ease-in-out'
+    });
+
+    // Configure toastr
+    toastr.options = {
+        "closeButton": true,
+        "progressBar": true,
+        "positionClass": "toast-top-right",
+        "timeOut": "3000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    };
+
+    // Billing toggle
+    let annual = false;
+    
+    function toggleBilling() {
+        annual = !annual;
+        updatePricing();
+        
+        if (annual) {
+            toastr.success('20% annual discount applied!', 'Savings activated');
+        } else {
+            toastr.info('Monthly pricing selected');
+        }
+    }
+
+    function updatePricing() {
+        const teamPrice = document.getElementById('teamPrice');
+        const teamPeriod = document.getElementById('teamPeriod');
+        
+        if (annual) {
+            teamPrice.innerHTML = '$115';
+            teamPeriod.innerHTML = 'per user/year';
+            document.querySelector('.save-badge').style.background = 'var(--primary)';
+            document.querySelector('.save-badge').style.color = 'white';
+        } else {
+            teamPrice.innerHTML = '$12';
+            teamPeriod.innerHTML = 'per user/month';
+            document.querySelector('.save-badge').style.background = 'rgba(27, 77, 62, 0.1)';
+            document.querySelector('.save-badge').style.color = 'var(--primary)';
+        }
+    }
+
+    // Plan selection
+    function selectPlan(plan) {
+        switch(plan) {
+            case 'free':
+                toastr.info('Redirecting to signup page...');
+                setTimeout(() => {
+                    window.location.href = "{% url 'signup' %}?plan=free";
+                }, 1000);
+                break;
+            case 'team':
+                toastr.success('Starting your 14-day free trial!');
+                setTimeout(() => {
+                    window.location.href = "{% url 'signup' %}?plan=team&billing=" + (annual ? 'annual' : 'monthly');
+                }, 1000);
+                break;
+            case 'business':
+                toastr.info('Connecting you with sales team...');
+                setTimeout(() => {
+                    window.location.href = "{% url 'contact-sales' %}?plan=business";
+                }, 1000);
+                break;
+        }
+    }
+
+    // Start free trial
+    function startFreeTrial(event) {
+        event.preventDefault();
+        toastr.success('Starting your free trial!');
+        setTimeout(() => {
+            window.location.href = "{% url 'signup' %}?trial=true";
+        }, 1000);
+    }
+
+    // Talk to sales
+    function talkToSales(event) {
+        event.preventDefault();
+        toastr.info('Connecting to sales team...');
+        setTimeout(() => {
+            window.location.href = "{% url 'contact-sales' %}";
+        }, 1000);
+    }
+
+    // FAQ toggle
+    function toggleFAQ(element) {
+        const answer = element.querySelector('.faq-answer');
+        const icon = element.querySelector('h4 i');
+        
+        if (answer.style.display === 'none' || !answer.style.display) {
+            // Close other open FAQs
+            document.querySelectorAll('.faq-answer').forEach(a => {
+                if (a !== answer && a.style.display === 'block') {
+                    a.style.display = 'none';
+                    a.parentElement.querySelector('h4 i').className = 'bi bi-question-circle';
+                }
+            });
+            
+            answer.style.display = 'block';
+            icon.className = 'bi bi-question-circle-fill';
+            element.style.background = 'rgba(27, 77, 62, 0.02)';
+        } else {
+            answer.style.display = 'none';
+            icon.className = 'bi bi-question-circle';
+            element.style.background = 'white';
+        }
+    }
+
+    // Show info tooltips
+    function showInfo(plan) {
+        const messages = {
+            free: 'Free plan includes basic AI features. Perfect for individuals and small teams getting started.',
+            team: 'Team plan includes unlimited AI summaries and shared action items for fast-moving teams.',
+            business: 'Business plan includes SSO, dedicated success support, and enterprise-grade controls.'
+        };
+        toastr.info(messages[plan], 'Plan Details', { timeOut: 4000 });
+    }
+
+    // Handle URL parameters
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const plan = urlParams.get('plan');
+        if (plan) {
+            toastr.info(`Viewing ${plan} plan details`);
+            document.getElementById(plan + 'Plan').scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+
+    // Add hover effects for compare rows
+    document.querySelectorAll('.compare-row:not(.header)').forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.background = 'rgba(27, 77, 62, 0.02)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.background = 'white';
+        });
+    });
+</script>
+{% endblock %}

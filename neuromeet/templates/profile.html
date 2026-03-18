@@ -1,0 +1,1851 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NeuroMeet AI | My Profile{% endblock %}
+
+{% block meta_description %}Manage your NeuroMeet AI profile, account settings, and preferences.{% endblock %}
+
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block extra_css %}
+<!-- AOS Animation Library -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<!-- Toastr for notifications -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<style>
+    /* ===== DEEP GREEN THEME ===== */
+    :root {
+        --primary: #1B4D3E;
+        --primary-dark: #0E3529;
+        --primary-light: #2E6B58;
+        --secondary: #235B4A;
+        --accent: #D4A373;
+        --success: #1B4D3E;
+        --warning: #E6B17E;
+        --danger: #C76A6A;
+        --dark: #0E3529;
+        --light: #FFFFFF;
+        --gray: #4A5568;
+        --gray-light: #718096;
+        --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        --gradient-accent: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);
+        --shadow-sm: 0 4px 6px -1px rgba(27, 77, 62, 0.1);
+        --shadow-md: 0 10px 15px -3px rgba(27, 77, 62, 0.15);
+        --shadow-lg: 0 20px 25px -5px rgba(27, 77, 62, 0.2);
+        --shadow-xl: 0 25px 50px -12px rgba(27, 77, 62, 0.25);
+        --border-radius: 1rem;
+        --border-radius-sm: 0.5rem;
+        --border-radius-lg: 2rem;
+        --transition: all 0.3s ease;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background: #f8fafc;
+        color: var(--dark);
+    }
+
+    .auth-topbar {
+        display: flex;
+        justify-content: flex-start;
+        width: 100%;
+        margin-bottom: 2rem;
+    }
+
+    .container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    /* ===== PROFILE LAYOUT ===== */
+    .profile-page {
+        padding: 100px 0 60px;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%);
+    }
+
+    .profile-grid {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 2rem;
+        align-items: start;
+    }
+
+    /* ===== SIDEBAR CARD ===== */
+    .profile-sidebar {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-lg);
+        border: 1px solid rgba(27, 77, 62, 0.1);
+        overflow: hidden;
+        position: sticky;
+        top: 100px;
+    }
+
+    .profile-header {
+        background: var(--gradient-primary);
+        padding: 2rem 1.5rem;
+        text-align: center;
+        color: white;
+        position: relative;
+    }
+
+    .profile-header::after {
+        content: '';
+        position: absolute;
+        bottom: -20px;
+        left: 0;
+        right: 0;
+        height: 20px;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.05), transparent);
+    }
+
+    .profile-avatar-wrapper {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 1rem;
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 4px solid white;
+        box-shadow: var(--shadow-lg);
+        object-fit: cover;
+        background: var(--gradient-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .profile-avatar:hover {
+        transform: scale(1.05);
+        opacity: 0.9;
+    }
+
+    .avatar-overlay {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 36px;
+        height: 36px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        border: 2px solid var(--primary);
+    }
+
+    .avatar-overlay:hover {
+        transform: scale(1.1);
+        background: var(--primary);
+        color: white;
+    }
+
+    .avatar-overlay i {
+        color: var(--primary);
+        font-size: 1.2rem;
+        transition: var(--transition);
+    }
+
+    .avatar-overlay:hover i {
+        color: white;
+    }
+
+    .profile-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: white;
+    }
+
+    .profile-email {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.9);
+        word-break: break-all;
+    }
+
+    .profile-menu {
+        padding: 1.5rem;
+    }
+
+    .menu-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        border-radius: var(--border-radius-sm);
+        color: var(--gray);
+        text-decoration: none;
+        transition: var(--transition);
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+        font-size: 1rem;
+    }
+
+    .menu-item:hover {
+        background: rgba(27, 77, 62, 0.05);
+        color: var(--primary);
+    }
+
+    .menu-item.active {
+        background: rgba(27, 77, 62, 0.1);
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+    .menu-item i {
+        font-size: 1.2rem;
+        width: 24px;
+    }
+
+    .menu-item.logout {
+        color: var(--danger);
+        margin-top: 1rem;
+        border-top: 1px solid rgba(199, 106, 106, 0.2);
+        padding-top: 1.5rem;
+    }
+
+    .menu-item.logout:hover {
+        background: rgba(199, 106, 106, 0.1);
+    }
+
+    /* ===== MAIN CONTENT CARD ===== */
+    .profile-main {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-lg);
+        border: 1px solid rgba(27, 77, 62, 0.1);
+        overflow: hidden;
+    }
+
+    .content-header {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid rgba(27, 77, 62, 0.1);
+        background: rgba(27, 77, 62, 0.02);
+    }
+
+    .content-header h2 {
+        font-size: 1.5rem;
+        color: var(--primary-dark);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .content-header p {
+        color: var(--gray);
+        margin: 0.25rem 0 0;
+        font-size: 0.95rem;
+    }
+
+    .content-body {
+        padding: 2rem;
+    }
+
+    /* ===== FORMS ===== */
+    .form-section {
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid rgba(27, 77, 62, 0.1);
+    }
+
+    .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .form-section h3 {
+        font-size: 1.1rem;
+        color: var(--primary-dark);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .form-group.full-width {
+        grid-column: span 2;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--primary-dark);
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-label i {
+        color: var(--primary);
+    }
+
+    .form-control {
+        padding: 0.875rem 1rem;
+        border: 2px solid rgba(27, 77, 62, 0.1);
+        border-radius: var(--border-radius-sm);
+        font-family: 'Inter', sans-serif;
+        font-size: 1rem;
+        transition: var(--transition);
+        background: white;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(27, 77, 62, 0.1);
+    }
+
+    .form-control:disabled {
+        background: #f8fafc;
+        cursor: not-allowed;
+    }
+
+    .form-control.is-invalid {
+        border-color: var(--danger);
+        background: rgba(199, 106, 106, 0.05);
+    }
+
+    .form-control.is-valid {
+        border-color: var(--success);
+        background: rgba(27, 77, 62, 0.05);
+    }
+
+    .input-hint {
+        font-size: 0.85rem;
+        color: var(--gray-light);
+        margin-top: 0.25rem;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        border-radius: var(--border-radius-sm);
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+        z-index: -1;
+    }
+
+    .btn:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary {
+        background: var(--gradient-primary);
+        color: white;
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 2px solid var(--primary);
+        color: var(--primary);
+    }
+
+    .btn-outline:hover {
+        background: var(--primary);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn-danger {
+        background: var(--danger);
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #b85c5c;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(199, 106, 106, 0.3);
+    }
+
+    .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    /* ===== AVATAR UPLOAD MODAL ===== */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal.show {
+        display: flex;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: var(--border-radius);
+        max-width: 500px;
+        width: 90%;
+        padding: 2rem;
+        box-shadow: var(--shadow-xl);
+        animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .modal-header h3 {
+        color: var(--primary-dark);
+        margin: 0;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--gray);
+        transition: var(--transition);
+    }
+
+    .modal-close:hover {
+        color: var(--danger);
+        transform: rotate(90deg);
+    }
+
+    .upload-area {
+        border: 2px dashed rgba(27, 77, 62, 0.2);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: var(--transition);
+        margin-bottom: 1rem;
+    }
+
+    .upload-area:hover {
+        border-color: var(--primary);
+        background: rgba(27, 77, 62, 0.02);
+    }
+
+    .upload-area i {
+        font-size: 3rem;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .upload-area p {
+        color: var(--gray);
+        margin: 0;
+    }
+
+    .upload-area small {
+        color: var(--gray-light);
+    }
+
+    .avatar-preview {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        margin: 1rem auto;
+        overflow: hidden;
+        border: 3px solid var(--primary);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .avatar-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* ===== STATS CARDS ===== */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: rgba(27, 77, 62, 0.05);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        text-align: center;
+        transition: var(--transition);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        background: rgba(27, 77, 62, 0.08);
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary);
+        line-height: 1;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        color: var(--gray);
+        font-size: 0.9rem;
+    }
+
+    /* ===== MEETINGS LIST ===== */
+    .meetings-list {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .meeting-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem;
+        background: rgba(27, 77, 62, 0.02);
+        border-radius: var(--border-radius-sm);
+        transition: var(--transition);
+        border: 1px solid rgba(27, 77, 62, 0.05);
+    }
+
+    .meeting-item:hover {
+        background: rgba(27, 77, 62, 0.05);
+        transform: translateX(4px);
+    }
+
+    .meeting-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .meeting-icon {
+        width: 40px;
+        height: 40px;
+        background: var(--gradient-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .meeting-details h4 {
+        color: var(--primary-dark);
+        margin: 0 0 0.25rem;
+        font-size: 1rem;
+    }
+
+    .meeting-details p {
+        color: var(--gray);
+        margin: 0;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .meeting-details i {
+        color: var(--primary);
+        font-size: 0.8rem;
+    }
+
+    .meeting-status {
+        padding: 0.25rem 0.75rem;
+        border-radius: 40px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .status-completed {
+        background: rgba(27, 77, 62, 0.1);
+        color: var(--primary);
+    }
+
+    .status-upcoming {
+        background: rgba(212, 163, 115, 0.1);
+        color: var(--accent);
+    }
+
+    .status-cancelled {
+        background: rgba(199, 106, 106, 0.1);
+        color: var(--danger);
+    }
+
+    .meeting-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .meeting-actions button {
+        background: none;
+        border: none;
+        color: var(--gray);
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 50%;
+        transition: var(--transition);
+    }
+
+    .meeting-actions button:hover {
+        background: rgba(27, 77, 62, 0.1);
+        color: var(--primary);
+    }
+
+    /* ===== BILLING SECTION ===== */
+    .plan-card {
+        background: var(--gradient-primary);
+        color: white;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .plan-name {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+
+    .plan-price {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .plan-price small {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+
+    .plan-features {
+        list-style: none;
+        padding: 0;
+        margin: 1rem 0;
+    }
+
+    .plan-features li {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .plan-features i {
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* ===== NOTIFICATIONS ===== */
+    .notification-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        border-bottom: 1px solid rgba(27, 77, 62, 0.1);
+        transition: var(--transition);
+    }
+
+    .notification-item:hover {
+        background: rgba(27, 77, 62, 0.02);
+    }
+
+    .notification-icon {
+        width: 40px;
+        height: 40px;
+        background: rgba(27, 77, 62, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+    }
+
+    .notification-content {
+        flex: 1;
+    }
+
+    .notification-content p {
+        margin: 0 0 0.25rem;
+        color: var(--dark);
+    }
+
+    .notification-content small {
+        color: var(--gray-light);
+    }
+
+    .notification-badge {
+        width: 10px;
+        height: 10px;
+        background: var(--primary);
+        border-radius: 50%;
+    }
+
+    /* ===== LOADING SPINNER ===== */
+    .spinner {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* ===== TOGGLE SWITCH ===== */
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--gray-light);
+        transition: .4s;
+        border-radius: 34px;
+    }
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .toggle-slider {
+        background: var(--gradient-primary);
+    }
+
+    input:checked + .toggle-slider:before {
+        transform: translateX(26px);
+    }
+
+    .setting-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid rgba(27, 77, 62, 0.1);
+    }
+
+    .setting-item:last-child {
+        border-bottom: none;
+    }
+
+    .setting-info h4 {
+        color: var(--primary-dark);
+        margin: 0 0 0.25rem;
+        font-size: 1rem;
+    }
+
+    .setting-info p {
+        color: var(--gray);
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 968px) {
+        .profile-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .profile-sidebar {
+            position: static;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group.full-width {
+            grid-column: span 1;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .profile-page {
+            padding: 80px 0 40px;
+        }
+
+        .container {
+            padding: 0 1.5rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .btn-group {
+            flex-direction: column;
+        }
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: var(--light);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--primary);
+        border-radius: 6px;
+        border: 3px solid var(--light);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-dark);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+    <div class="container">
+        <div class="auth-topbar">
+            <a href="{% url 'home' %}" class="logo" aria-label="NeuroMeet AI home">
+                <span class="logo-mark" aria-hidden="true"></span>
+                <span class="logo-text">NeuroMeet<span class="logo-accent">AI</span></span>
+            </a>
+        </div>
+        <div class="profile-grid">
+            <!-- Sidebar -->
+            <div class="profile-sidebar" data-aos="fade-right">
+                <div class="profile-header">
+                    <div class="profile-avatar-wrapper">
+                        <div class="profile-avatar" onclick="openAvatarModal()" id="avatarDisplay">
+                            {% if user.profile.avatar %}
+                                <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                        {% else %}
+                            <span
+                                aria-label="{{ user.username }}"
+                                style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; color: rgba(255, 255, 255, 0.96);"
+                            >
+                                <i class="fas fa-user-circle" style="font-size: 4.75rem;" aria-hidden="true"></i>
+                            </span>
+                        {% endif %}
+                        </div>
+                        <div class="avatar-overlay" onclick="openAvatarModal()">
+                            <i class="bi bi-camera"></i>
+                        </div>
+                    </div>
+                    <h2 class="profile-name" id="sidebarName">{{ user.get_full_name|default:user.username }}</h2>
+                    <p class="profile-email" id="sidebarEmail">{{ user.email }}</p>
+                </div>
+
+                <div class="profile-menu">
+                    <button class="menu-item active" onclick="switchTab('profile')" id="menuProfile">
+                        <i class="bi bi-person"></i>
+                        Personal Info
+                    </button>
+                    <button class="menu-item" onclick="switchTab('meetings')" id="menuMeetings">
+                        <i class="bi bi-camera-video"></i>
+                        My Meetings
+                    </button>
+                    <button class="menu-item" onclick="switchTab('billing')" id="menuBilling">
+                        <i class="bi bi-credit-card"></i>
+                        Billing & Plan
+                    </button>
+                    <button class="menu-item" onclick="switchTab('notifications')" id="menuNotifications">
+                        <i class="bi bi-bell"></i>
+                        Notifications
+                        <span class="notification-badge" style="margin-left: auto;" id="notificationBadge"></span>
+                    </button>
+                    <button class="menu-item" onclick="switchTab('security')" id="menuSecurity">
+                        <i class="bi bi-shield-lock"></i>
+                        Security
+                    </button>
+                    <button class="menu-item" onclick="switchTab('preferences')" id="menuPreferences">
+                        <i class="bi bi-sliders2"></i>
+                        Preferences
+                    </button>
+                    <a class="menu-item logout" href="{% url 'logout' %}" onclick="return confirm('Are you sure you want to sign out?')">
+                        <i class="bi bi-box-arrow-right"></i>
+                        Sign Out
+                    </a>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="profile-main" data-aos="fade-left">
+                <!-- Personal Info Tab -->
+                <div id="tabProfile" class="tab-content">
+                    <div class="content-header">
+                        <h2><i class="bi bi-person"></i> Personal Information</h2>
+                        <p>Manage your profile details and contact information</p>
+                    </div>
+                    <div class="content-body">
+                        <form id="profileForm" method="post" action="{% url 'profile' %}" onsubmit="return updateProfile(event)">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="profile">
+                            
+                            <div class="form-section">
+                                <h3><i class="bi bi-info-circle"></i> Basic Information</h3>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <i class="bi bi-person"></i>
+                                            First Name
+                                        </label>
+                                        <input type="text" class="form-control" id="firstName" name="first_name" 
+                                               value="{{ user.first_name }}" placeholder="John">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <i class="bi bi-person"></i>
+                                            Last Name
+                                        </label>
+                                        <input type="text" class="form-control" id="lastName" name="last_name" 
+                                               value="{{ user.last_name }}" placeholder="Smith">
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label class="form-label">
+                                            <i class="bi bi-envelope"></i>
+                                            Email Address
+                                        </label>
+                                        <input type="email" class="form-control" id="email" name="email" 
+                                               value="{{ user.email }}" disabled>
+                                        <div class="input-hint">Contact support to change email</div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <i class="bi bi-telephone"></i>
+                                            Phone Number
+                                        </label>
+                                        <input type="tel" class="form-control" id="phone" name="phone" 
+                                               value="{{ user.profile.phone|default:'' }}" placeholder="+1 (555) 000-0000">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <i class="bi bi-building"></i>
+                                            Company
+                                        </label>
+                                        <input type="text" class="form-control" id="company" name="company" 
+                                               value="{{ user.profile.company|default:'' }}" placeholder="Company Name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <i class="bi bi-briefcase"></i>
+                                            Job Title
+                                        </label>
+                                        <input type="text" class="form-control" id="jobTitle" name="job_title" 
+                                               value="{{ user.profile.job_title|default:'' }}" placeholder="Product Manager">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h3><i class="bi bi-geo-alt"></i> Location</h3>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Country</label>
+                                        <select class="form-control" id="country" name="country">
+                                            <option value="">Select Country</option>
+                                            <option value="US" {% if user.profile.country == 'US' %}selected{% endif %}>United States</option>
+                                            <option value="UK" {% if user.profile.country == 'UK' %}selected{% endif %}>United Kingdom</option>
+                                            <option value="CA" {% if user.profile.country == 'CA' %}selected{% endif %}>Canada</option>
+                                            <option value="AU" {% if user.profile.country == 'AU' %}selected{% endif %}>Australia</option>
+                                            <option value="IN" {% if user.profile.country == 'IN' %}selected{% endif %}>India</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">City</label>
+                                        <input type="text" class="form-control" id="city" name="city" 
+                                               value="{{ user.profile.city|default:'' }}" placeholder="New York">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Time Zone</label>
+                                        <select class="form-control" id="timezone" name="timezone">
+                                            <option value="">Select Time Zone</option>
+                                            <option value="EST" {% if user.profile.timezone == 'EST' %}selected{% endif %}>Eastern Time</option>
+                                            <option value="CST" {% if user.profile.timezone == 'CST' %}selected{% endif %}>Central Time</option>
+                                            <option value="MST" {% if user.profile.timezone == 'MST' %}selected{% endif %}>Mountain Time</option>
+                                            <option value="PST" {% if user.profile.timezone == 'PST' %}selected{% endif %}>Pacific Time</option>
+                                            <option value="GMT" {% if user.profile.timezone == 'GMT' %}selected{% endif %}>Greenwich Mean Time</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h3><i class="bi bi-link"></i> Social Profiles</h3>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <i class="bi bi-linkedin"></i>
+                                            LinkedIn
+                                        </label>
+                                        <input type="url" class="form-control" id="linkedin" name="linkedin" 
+                                               value="{{ user.profile.linkedin|default:'' }}" placeholder="https://linkedin.com/in/username">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <i class="bi bi-twitter"></i>
+                                            Twitter
+                                        </label>
+                                        <input type="url" class="form-control" id="twitter" name="twitter" 
+                                               value="{{ user.profile.twitter|default:'' }}" placeholder="https://twitter.com/username">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <i class="bi bi-github"></i>
+                                            GitHub
+                                        </label>
+                                        <input type="url" class="form-control" id="github" name="github" 
+                                               value="{{ user.profile.github|default:'' }}" placeholder="https://github.com/username">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="btn-group">
+                                <button type="submit" class="btn btn-primary" id="saveProfileBtn">
+                                    <i class="bi bi-check-lg"></i>
+                                    Save Changes
+                                </button>
+                                <button type="button" class="btn btn-outline" onclick="resetProfileForm()">
+                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                    Reset
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Meetings Tab -->
+                <div id="tabMeetings" class="tab-content" style="display: none;">
+                    <div class="content-header">
+                        <h2><i class="bi bi-camera-video"></i> My Meetings</h2>
+                        <p>View and manage your scheduled meetings</p>
+                    </div>
+                    <div class="content-body">
+                        <!-- Stats -->
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value" id="totalMeetings">24</div>
+                                <div class="stat-label">Total Meetings</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="upcomingMeetings">3</div>
+                                <div class="stat-label">Upcoming</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="hoursSaved">12.5</div>
+                                <div class="stat-label">Hours Saved</div>
+                            </div>
+                        </div>
+
+                        <!-- Filters -->
+                        <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                            <select class="form-control" style="width: auto;" id="meetingFilter" onchange="filterMeetings()">
+                                <option value="all">All Meetings</option>
+                                <option value="upcoming">Upcoming</option>
+                                <option value="past">Past</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                            <input type="text" class="form-control" placeholder="Search meetings..." 
+                                   style="flex: 1;" id="meetingSearch" onkeyup="searchMeetings()">
+                        </div>
+
+                        <!-- Meetings List -->
+                        <div class="meetings-list" id="meetingsList">
+                            <!-- Dynamic content via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Billing Tab -->
+                <div id="tabBilling" class="tab-content" style="display: none;">
+                    <div class="content-header">
+                        <h2><i class="bi bi-credit-card"></i> Billing & Plan</h2>
+                        <p>Manage your subscription and payment methods</p>
+                    </div>
+                    <div class="content-body">
+                        <!-- Current Plan -->
+                        <div class="plan-card">
+                            <div class="plan-name" id="currentPlanName">Team Plan</div>
+                            <div class="plan-price" id="currentPlanPrice">$12 <small>/month</small></div>
+                            <ul class="plan-features" id="planFeatures">
+                                <li><i class="bi bi-check-circle"></i> Unlimited meetings</li>
+                                <li><i class="bi bi-check-circle"></i> AI summaries</li>
+                                <li><i class="bi bi-check-circle"></i> Priority support</li>
+                            </ul>
+                            <button class="btn btn-outline" style="background: white; color: var(--primary);" onclick="changePlan()">
+                                Change Plan
+                            </button>
+                        </div>
+
+                        <!-- Payment Methods -->
+                        <h3 style="margin: 2rem 0 1rem;">Payment Methods</h3>
+                        <div class="payment-methods" id="paymentMethods">
+                            <!-- Dynamic via JS -->
+                        </div>
+
+                        <!-- Billing History -->
+                        <h3 style="margin: 2rem 0 1rem;">Billing History</h3>
+                        <div class="billing-history" id="billingHistory">
+                            <!-- Dynamic via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications Tab -->
+                <div id="tabNotifications" class="tab-content" style="display: none;">
+                    <div class="content-header">
+                        <h2><i class="bi bi-bell"></i> Notifications</h2>
+                        <p>Stay updated with your meeting activity</p>
+                    </div>
+                    <div class="content-body">
+                        <div class="notifications-list" id="notificationsList">
+                            <!-- Dynamic via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Tab -->
+                <div id="tabSecurity" class="tab-content" style="display: none;">
+                    <div class="content-header">
+                        <h2><i class="bi bi-shield-lock"></i> Security</h2>
+                        <p>Manage your password and security settings</p>
+                    </div>
+                    <div class="content-body">
+                        <form id="passwordForm" method="post" action="{% url 'profile' %}" onsubmit="return changePassword(event)">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="password">
+                            
+                            <div class="form-section">
+                                <h3>Change Password</h3>
+                                <div class="form-group" style="margin-bottom: 1rem;">
+                                    <label class="form-label">Current Password</label>
+                                    <input type="password" class="form-control" id="currentPassword" name="current_password" required>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 1rem;">
+                                    <label class="form-label">New Password</label>
+                                    <input type="password" class="form-control" id="newPassword" name="new_password" required 
+                                           onkeyup="checkPasswordStrength()">
+                                    <div class="password-strength" id="passwordStrength"></div>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 1rem;">
+                                    <label class="form-label">Confirm New Password</label>
+                                    <input type="password" class="form-control" id="confirmPassword" name="confirm_password" required 
+                                           onkeyup="checkPasswordMatch()">
+                                    <div id="passwordMatch"></div>
+                                </div>
+                                <button type="submit" class="btn btn-primary" id="changePasswordBtn">
+                                    Update Password
+                                </button>
+                            </div>
+
+                            <div class="form-section">
+                                <h3>Two-Factor Authentication</h3>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <h4>Enable 2FA</h4>
+                                        <p>Add an extra layer of security to your account</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="twoFactor" onchange="toggle2FA()">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h3>Active Sessions</h3>
+                                <div id="activeSessions">
+                                    <!-- Dynamic via JS -->
+                                </div>
+                                <button class="btn btn-outline btn-sm" style="margin-top: 1rem;" onclick="logoutAllDevices()">
+                                    Log out from all devices
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Preferences Tab -->
+                <div id="tabPreferences" class="tab-content" style="display: none;">
+                    <div class="content-header">
+                        <h2><i class="bi bi-sliders2"></i> Preferences</h2>
+                        <p>Customize your NeuroMeet AI experience</p>
+                    </div>
+                    <div class="content-body">
+                        <form id="preferencesForm" method="post" action="{% url 'profile' %}" onsubmit="return savePreferences(event)">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="preferences">
+                        <div class="form-section">
+                            <h3>Meeting Preferences</h3>
+                            
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <h4>Default Microphone</h4>
+                                    <p>Choose your default input device</p>
+                                </div>
+                                <select class="form-control" style="width: 200px;" id="defaultMic" name="default_mic">
+                                    <option value="default" {% if user.profile.default_mic == 'default' %}selected{% endif %}>Default - Microphone</option>
+                                    <option value="external" {% if user.profile.default_mic == 'external' %}selected{% endif %}>External Microphone</option>
+                                    <option value="headset" {% if user.profile.default_mic == 'headset' %}selected{% endif %}>Headset</option>
+                                </select>
+                            </div>
+
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <h4>Default Speaker</h4>
+                                    <p>Choose your default output device</p>
+                                </div>
+                                <select class="form-control" style="width: 200px;" id="defaultSpeaker" name="default_speaker">
+                                    <option value="default" {% if user.profile.default_speaker == 'default' %}selected{% endif %}>Default - Speakers</option>
+                                    <option value="headphones" {% if user.profile.default_speaker == 'headphones' %}selected{% endif %}>Headphones</option>
+                                    <option value="external" {% if user.profile.default_speaker == 'external' %}selected{% endif %}>External Speakers</option>
+                                </select>
+                            </div>
+
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <h4>Noise Cancellation</h4>
+                                    <p>Automatically remove background noise</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="noiseCancellation" name="noise_cancellation" {% if user.profile.noise_cancellation %}checked{% endif %}>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <h4>Auto-transcription</h4>
+                                    <p>Automatically generate meeting transcripts</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="autoTranscription" name="auto_transcription" {% if user.profile.auto_transcription %}checked{% endif %}>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3>Email Preferences</h3>
+                            
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <h4>Meeting Reminders</h4>
+                                    <p>Receive email reminders before meetings</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="emailReminders" name="email_reminders" {% if user.profile.email_reminders %}checked{% endif %}>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <h4>Weekly Summary</h4>
+                                    <p>Get a weekly summary of your meetings</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="weeklySummary" name="weekly_summary" {% if user.profile.weekly_summary %}checked{% endif %}>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <h4>Product Updates</h4>
+                                    <p>Receive news about new features</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="productUpdates" name="product_updates" {% if user.profile.product_updates %}checked{% endif %}>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-primary" type="submit" id="savePreferencesBtn">
+                                Save Preferences
+                            </button>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Avatar Upload Modal -->
+<div id="avatarModal" class="modal">
+    <form id="avatarForm" class="modal-content" method="post" action="{% url 'profile' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="avatar">
+        <div class="modal-header">
+            <h3>Update Profile Picture</h3>
+            <button type="button" class="modal-close" onclick="closeAvatarModal()">&times;</button>
+        </div>
+        
+        <div class="upload-area" onclick="document.getElementById('avatarInput').click()">
+            <i class="bi bi-cloud-upload"></i>
+            <p>Click to upload or drag and drop</p>
+            <small>PNG, JPG, GIF up to 5MB</small>
+            <input type="file" id="avatarInput" name="avatar" accept="image/*" style="display: none;" onchange="previewAvatar()">
+        </div>
+
+        <div class="avatar-preview" id="avatarPreview">
+            <img src="" alt="Preview" style="display: none;">
+            <div id="avatarPreviewPlaceholder" style="width: 100%; height: 100%; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem;">
+                {{ user.username|first|upper }}
+            </div>
+        </div>
+
+        <div class="btn-group" style="justify-content: flex-end;">
+            <button type="button" class="btn btn-outline" onclick="closeAvatarModal()">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="uploadAvatar()" id="uploadAvatarBtn">Upload</button>
+        </div>
+    </form>
+</div>
+
+<!-- Scripts -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script>
+    // Initialize AOS
+    AOS.init({
+        duration: 800,
+        once: true
+    });
+
+    // Configure toastr
+    toastr.options = {
+        "closeButton": true,
+        "progressBar": true,
+        "positionClass": "toast-top-right",
+        "timeOut": "3000"
+    };
+
+    // ===== TAB SWITCHING =====
+    function switchTab(tabName) {
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.style.display = 'none';
+        });
+
+        // Show selected tab
+        document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).style.display = 'block';
+
+        // Update menu active state
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        document.getElementById('menu' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active');
+
+        // Load tab-specific data
+        if (tabName === 'meetings') loadMeetings();
+        if (tabName === 'billing') loadBilling();
+        if (tabName === 'notifications') loadNotifications();
+        if (tabName === 'security') loadSessions();
+    }
+
+    // ===== PROFILE UPDATE =====
+    function updateProfile(event) {
+        const btn = document.getElementById('saveProfileBtn');
+        btn.innerHTML = '<span class="spinner"></span> Saving...';
+        btn.disabled = true;
+        return true;
+    }
+
+    function resetProfileForm() {
+        if (confirm('Reset all changes?')) {
+            location.reload();
+        }
+    }
+
+    // ===== AVATAR MODAL =====
+    function openAvatarModal() {
+        document.getElementById('avatarModal').classList.add('show');
+    }
+
+    function closeAvatarModal() {
+        document.getElementById('avatarModal').classList.remove('show');
+    }
+
+    function previewAvatar() {
+        const file = document.getElementById('avatarInput').files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('avatarPreview').querySelector('img').src = e.target.result;
+                document.getElementById('avatarPreview').querySelector('img').style.display = 'block';
+                document.getElementById('avatarPreviewPlaceholder').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function uploadAvatar() {
+        const fileInput = document.getElementById('avatarInput');
+        if (!fileInput.files || !fileInput.files.length) {
+            toastr.error('Please choose an image first.');
+            return;
+        }
+        const btn = document.getElementById('uploadAvatarBtn');
+        btn.innerHTML = '<span class="spinner"></span> Uploading...';
+        btn.disabled = true;
+        document.getElementById('avatarForm').submit();
+    }
+
+    // ===== MEETINGS =====
+    function loadMeetings() {
+        const meetings = [
+            {
+                id: 1,
+                title: 'Product Review',
+                date: '2024-03-20',
+                time: '10:00 AM',
+                duration: '45 min',
+                participants: 8,
+                status: 'upcoming'
+            },
+            {
+                id: 2,
+                title: 'Sprint Planning',
+                date: '2024-03-19',
+                time: '2:00 PM',
+                duration: '60 min',
+                participants: 12,
+                status: 'completed'
+            },
+            {
+                id: 3,
+                title: 'Client Call',
+                date: '2024-03-18',
+                time: '11:30 AM',
+                duration: '30 min',
+                participants: 4,
+                status: 'completed'
+            },
+            {
+                id: 4,
+                title: 'Team Sync',
+                date: '2024-03-22',
+                time: '9:30 AM',
+                duration: '30 min',
+                participants: 6,
+                status: 'upcoming'
+            },
+            {
+                id: 5,
+                title: 'Design Review',
+                date: '2024-03-17',
+                time: '3:00 PM',
+                duration: '45 min',
+                participants: 5,
+                status: 'cancelled'
+            }
+        ];
+
+        // Update stats
+        document.getElementById('totalMeetings').textContent = meetings.length;
+        document.getElementById('upcomingMeetings').textContent = meetings.filter(m => m.status === 'upcoming').length;
+        document.getElementById('hoursSaved').textContent = '12.5';
+
+        displayMeetings(meetings);
+    }
+
+    function displayMeetings(meetings) {
+        const list = document.getElementById('meetingsList');
+        list.innerHTML = meetings.map(meeting => `
+            <div class="meeting-item">
+                <div class="meeting-info">
+                    <div class="meeting-icon">
+                        <i class="bi bi-camera-video"></i>
+                    </div>
+                    <div class="meeting-details">
+                        <h4>${meeting.title}</h4>
+                        <p>
+                            <i class="bi bi-calendar"></i> ${meeting.date}
+                            <i class="bi bi-clock"></i> ${meeting.time} (${meeting.duration})
+                            <i class="bi bi-people"></i> ${meeting.participants} participants
+                        </p>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <span class="meeting-status status-${meeting.status}">
+                        ${meeting.status.charAt(0).toUpperCase() + meeting.status.slice(1)}
+                    </span>
+                    <div class="meeting-actions">
+                        <button onclick="viewMeeting(${meeting.id})" title="View Details">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button onclick="joinMeeting(${meeting.id})" title="Join">
+                            <i class="bi bi-camera-video"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function filterMeetings() {
+        const filter = document.getElementById('meetingFilter').value;
+        loadMeetings(); // Reload with filter in real app
+    }
+
+    function searchMeetings() {
+        const search = document.getElementById('meetingSearch').value.toLowerCase();
+        // Implement search in real app
+    }
+
+    function viewMeeting(id) {
+        toastr.info('Opening meeting details...');
+    }
+
+    function joinMeeting(id) {
+        toastr.success('Joining meeting...');
+        setTimeout(() => {
+            window.location.href = "{% url 'room' %}?meeting=" + id;
+        }, 1000);
+    }
+
+    // ===== BILLING =====
+    function loadBilling() {
+        // Load payment methods
+        document.getElementById('paymentMethods').innerHTML = `
+            <div class="payment-method" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; border: 1px solid rgba(27,77,62,0.1); border-radius: 8px; margin-bottom: 1rem;">
+                <i class="bi bi-credit-card" style="font-size: 2rem; color: var(--primary);"></i>
+                <div style="flex: 1;">
+                    <strong>Visa ending in 4242</strong>
+                    <p style="margin: 0; color: var(--gray); font-size: 0.9rem;">Expires 12/25</p>
+                </div>
+                <button class="btn btn-outline btn-sm" onclick="editPaymentMethod()">Edit</button>
+            </div>
+        `;
+
+        // Load billing history
+        document.getElementById('billingHistory').innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid rgba(27,77,62,0.1);">
+                <div>
+                    <strong>Team Plan - March 2024</strong>
+                    <p style="margin: 0; color: var(--gray); font-size: 0.85rem;">March 1, 2024</p>
+                </div>
+                <span>$12.00</span>
+                <a href="#" style="color: var(--primary);" onclick="downloadInvoice('March 2024'); return false;">Download</a>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid rgba(27,77,62,0.1);">
+                <div>
+                    <strong>Team Plan - February 2024</strong>
+                    <p style="margin: 0; color: var(--gray); font-size: 0.85rem;">February 1, 2024</p>
+                </div>
+                <span>$12.00</span>
+                <a href="#" style="color: var(--primary);" onclick="downloadInvoice('February 2024'); return false;">Download</a>
+            </div>
+        `;
+    }
+
+    function editPaymentMethod() {
+        toastr.info('Payment method editor coming soon.');
+    }
+
+    function downloadInvoice(label) {
+        const content = `NeuroMeet AI Invoice\n\nPlan: Team Plan\nPeriod: ${label}\nAmount: $12.00\nStatus: Paid\n\nThank you for your subscription.`;
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `neuromeet-invoice-${label.replace(/\s+/g, '-').toLowerCase()}.txt`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        toastr.success('Invoice downloaded');
+    }
+
+    function changePlan() {
+        toastr.info('Redirecting to pricing page...');
+        setTimeout(() => {
+            window.location.href = '/pricing/';
+        }, 1000);
+    }
+
+    // ===== NOTIFICATIONS =====
+    function loadNotifications() {
+        const notifications = [
+            {
+                id: 1,
+                type: 'meeting',
+                message: 'Product Review meeting starts in 15 minutes',
+                time: '5 min ago',
+                read: false
+            },
+            {
+                id: 2,
+                type: 'summary',
+                message: 'AI summary ready for Sprint Planning',
+                time: '2 hours ago',
+                read: false
+            },
+            {
+                id: 3,
+                type: 'action',
+                message: '3 action items need your attention',
+                time: '1 day ago',
+                read: true
+            }
+        ];
+
+        document.getElementById('notificationsList').innerHTML = notifications.map(n => `
+            <div class="notification-item" onclick="markNotificationRead(${n.id})" style="cursor: pointer;">
+                <div class="notification-icon">
+                    <i class="bi bi-${n.type === 'meeting' ? 'camera-video' : n.type === 'summary' ? 'file-text' : 'check-circle'}"></i>
+                </div>
+                <div class="notification-content">
+                    <p>${n.message}</p>
+                    <small>${n.time}</small>
+                </div>
+                ${!n.read ? '<span class="notification-badge"></span>' : ''}
+            </div>
+        `).join('');
+
+        // Update badge count
+        const unreadCount = notifications.filter(n => !n.read).length;
+        document.getElementById('notificationBadge').textContent = unreadCount > 0 ? unreadCount : '';
+    }
+
+    function markNotificationRead(id) {
+        toastr.info('Marked as read');
+        loadNotifications();
+    }
+
+    // ===== SECURITY =====
+    function checkPasswordStrength() {
+        const password = document.getElementById('newPassword').value;
+        const strengthDiv = document.getElementById('passwordStrength');
+        
+        let strength = 0;
+        if (password.length >= 8) strength++;
+        if (password.match(/[a-z]+/)) strength++;
+        if (password.match(/[A-Z]+/)) strength++;
+        if (password.match(/[0-9]+/)) strength++;
+        if (password.match(/[$@#&!]+/)) strength++;
+
+        const strengths = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
+        const colors = ['#C76A6A', '#E6B17E', '#D4A373', '#2E6B58', '#1B4D3E'];
+        
+        strengthDiv.innerHTML = `
+            <div style="margin-top: 0.5rem;">
+                <div style="height: 4px; background: #e0e0e0; border-radius: 2px;">
+                    <div style="height: 4px; width: ${strength * 20}%; background: ${colors[strength-1] || '#e0e0e0'}; border-radius: 2px;"></div>
+                </div>
+                <small style="color: ${colors[strength-1] || '#999'};">${strengths[strength-1] || 'Very Weak'}</small>
+            </div>
+        `;
+    }
+
+    function checkPasswordMatch() {
+        const newPass = document.getElementById('newPassword').value;
+        const confirmPass = document.getElementById('confirmPassword').value;
+        const matchDiv = document.getElementById('passwordMatch');
+
+        if (newPass && confirmPass) {
+            if (newPass === confirmPass) {
+                matchDiv.innerHTML = '<small style="color: var(--success);">✓ Passwords match</small>';
+            } else {
+                matchDiv.innerHTML = '<small style="color: var(--danger);">✗ Passwords do not match</small>';
+            }
+        }
+    }
+
+    function changePassword(event) {
+        const btn = document.getElementById('changePasswordBtn');
+        btn.innerHTML = '<span class="spinner"></span> Updating...';
+        btn.disabled = true;
+        return true;
+    }
+
+    function toggle2FA() {
+        const enabled = document.getElementById('twoFactor').checked;
+        toastr.info(enabled ? '2FA enabled' : '2FA disabled');
+    }
+
+    function loadSessions() {
+        const sessions = [
+            {
+                device: 'Chrome on MacBook Pro',
+                location: 'New York, US',
+                lastActive: 'Now',
+                current: true
+            },
+            {
+                device: 'Safari on iPhone',
+                location: 'New York, US',
+                lastActive: '2 hours ago',
+                current: false
+            }
+        ];
+
+        document.getElementById('activeSessions').innerHTML = sessions.map(s => `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid rgba(27,77,62,0.1);">
+                <div>
+                    <strong>${s.device}</strong>
+                    <p style="margin: 0; color: var(--gray); font-size: 0.9rem;">${s.location} · ${s.lastActive}</p>
+                </div>
+                ${s.current ? '<span class="badge" style="background: rgba(27,77,62,0.1); color: var(--primary); padding: 4px 8px; border-radius: 40px;">Current</span>' : ''}
+            </div>
+        `).join('');
+    }
+
+    function logoutAllDevices() {
+        if (confirm('This will log you out from all devices. Continue?')) {
+            toastr.success('Logged out from all devices');
+        }
+    }
+
+    // ===== PREFERENCES =====
+    function savePreferences(event) {
+        const btn = document.getElementById('savePreferencesBtn');
+        if (btn) {
+            btn.innerHTML = '<span class="spinner"></span> Saving...';
+            btn.disabled = true;
+        }
+        return true;
+    }
+
+    // ===== LOGOUT =====
+    function logout() {
+        if (confirm('Are you sure you want to sign out?')) {
+            toastr.info('Signing out...');
+            setTimeout(() => {
+                window.location.href = "{% url 'logout' %}";
+            }, 1000);
+        }
+    }
+
+    // ===== INITIAL LOAD =====
+    window.onload = function() {
+        // Load initial tab
+        switchTab('profile');
+
+        // Check URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const tab = urlParams.get('tab');
+        if (tab) {
+            switchTab(tab);
+        }
+    };
+</script>
+{% endblock %}
