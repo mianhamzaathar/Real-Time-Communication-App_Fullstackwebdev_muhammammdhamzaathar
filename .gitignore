@@ -1,4 +1,5 @@
 .env
+neuromeet/.env
 __pycache__/
 *.py[cod]
 *.sqlite3
@@ -12,6 +13,7 @@ env/
 .idea/
 *.log
 neuromeet/media/
+neuromeet/staticfiles/
 node_modules/
 dist/
 build/

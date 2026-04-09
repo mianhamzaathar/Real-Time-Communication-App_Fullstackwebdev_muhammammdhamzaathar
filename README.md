@@ -83,10 +83,8 @@ source .venv/bin/activate
 
 ### 3. Install dependencies
 
-There is no pinned `requirements.txt` in this repo yet, so install the current project dependencies manually:
-
 ```bash
-pip install django daphne channels channels-redis social-auth-app-django
+pip install -r requirements.txt
 ```
 
 ### 4. Create the environment file
@@ -131,14 +129,49 @@ Use `.env.example` as the base template.
 |---|---|
 | `DJANGO_SECRET_KEY` | Django secret key |
 | `DEBUG` | Development mode toggle |
+| `ALLOW_ALL_HOSTS_IN_DEBUG` | Allows wildcard hosts during local debug |
 | `ALLOWED_HOSTS` | Comma-separated allowed hosts |
+| `APP_BASE_URL` | Public site URL, used to help populate host and CSRF settings |
 | `CSRF_TRUSTED_ORIGINS` | Comma-separated trusted origins |
 | `ENABLE_HTTPS` | Enables secure cookies and HTTPS redirects |
+| `USE_WHITENOISE` | Enables WhiteNoise static file serving |
+| `SERVE_MEDIA` | Serves uploaded media files through Django |
+| `DATABASE_URL` | Optional database URL for Postgres or SQLite |
 | `REDIS_URL` | Optional Redis connection for Channels |
+| `MEDIA_ROOT` | Override upload storage path |
+| `STATIC_ROOT` | Override collected static files path |
 | `SOCIAL_AUTH_GOOGLE_OAUTH2_KEY` | Google OAuth client ID |
 | `SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET` | Google OAuth client secret |
 | `SOCIAL_AUTH_GITHUB_KEY` | GitHub OAuth client ID |
 | `SOCIAL_AUTH_GITHUB_SECRET` | GitHub OAuth client secret |
+
+## Deploy On Render
+
+This repository now includes:
+
+- `requirements.txt` for Python dependencies
+- `Procfile` for generic PaaS startup
+- `render.yaml` for one-click Render setup
+- `.python-version` to keep deployment on Python `3.10.11`
+
+### Quick Render flow
+
+1. Push this repository to GitHub.
+2. In Render, create a new Blueprint and point it at this repo.
+3. Render will create:
+   - one Python web service
+   - one Postgres database
+   - one Key Value instance for Redis
+4. After the first deploy, open the generated `.onrender.com` URL.
+
+### Important production notes
+
+- The app starts with Daphne so HTTP and WebSockets run through the ASGI app.
+- Static files are collected during build and served with WhiteNoise.
+- The default `render.yaml` uses free Render plans for easier demos.
+- Free Render web services lose local uploaded files on restart/redeploy, so profile avatar uploads are not durable on the free plan.
+- For a more durable production setup, move media to object storage or upgrade to a paid web service with persistent storage.
+- This project still uses STUN-only WebRTC by default, so some real-world peer connections may need a TURN server to be fully reliable.
 
 ## Main Routes
 
@@ -198,7 +231,6 @@ To quickly test the app:
 ## Known Gaps
 
 - No bundled TURN server configuration
-- No pinned `requirements.txt` yet
 - File sharing is room-level demo storage, not persistent cloud storage
 - AI features are not backed by a remote LLM/STT pipeline by default
 

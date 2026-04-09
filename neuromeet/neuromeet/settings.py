@@ -11,7 +11,10 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 import os
+import ipaddress
+import socket
 from pathlib import Path
+from urllib.parse import parse_qs, unquote, urlparse
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -49,6 +52,91 @@ def _env_list(name: str, default: str = '') -> list[str]:
     return [item.strip() for item in raw_value.split(',') if item.strip()]
 
 
+def _append_unique(items: list[str], value: str) -> None:
+    if value and value not in items:
+        items.append(value)
+
+
+def _database_config() -> dict[str, object]:
+    database_url = os.getenv('DATABASE_URL', '').strip()
+
+    if not database_url:
+        return {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+
+    parsed = urlparse(database_url)
+    scheme = parsed.scheme.lower()
+
+    if scheme in {'postgres', 'postgresql', 'pgsql'}:
+        config: dict[str, object] = {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': unquote(parsed.path.lstrip('/')) or 'postgres',
+        }
+
+        if parsed.username:
+            config['USER'] = unquote(parsed.username)
+        if parsed.password:
+            config['PASSWORD'] = unquote(parsed.password)
+        if parsed.hostname:
+            config['HOST'] = parsed.hostname
+        if parsed.port:
+            config['PORT'] = parsed.port
+
+        options = {
+            key: values[-1]
+            for key, values in parse_qs(parsed.query).items()
+            if values
+        }
+        if options:
+            config['OPTIONS'] = options
+
+        return config
+
+    if scheme == 'sqlite':
+        raw_path = unquote(parsed.path or '').lstrip('/')
+        db_path = Path(raw_path) if raw_path else BASE_DIR / 'db.sqlite3'
+        if not db_path.is_absolute():
+            db_path = BASE_DIR / db_path
+        return {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': db_path,
+        }
+
+    raise ValueError(f'Unsupported DATABASE_URL scheme: {scheme}')
+
+
+def _local_ipv4_hosts() -> list[str]:
+    hosts: set[str] = set()
+    addresses: set[str] = set()
+
+    try:
+        for info in socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET):
+            addresses.add(info[4][0])
+    except OSError:
+        pass
+
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+            sock.connect(('8.8.8.8', 80))
+            addresses.add(sock.getsockname()[0])
+    except OSError:
+        pass
+
+    for address in addresses:
+        try:
+            ip = ipaddress.ip_address(address)
+        except ValueError:
+            continue
+
+        if ip.version != 4 or ip.is_loopback or ip.is_link_local:
+            continue
+        hosts.add(address)
+
+    return sorted(hosts)
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -57,8 +145,22 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-lu)vc9(3oeu=cl@nv+g
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = _env_bool('DEBUG', True)
+ALLOW_ALL_HOSTS_IN_DEBUG = _env_bool('ALLOW_ALL_HOSTS_IN_DEBUG', DEBUG)
+APP_BASE_URL = os.getenv('APP_BASE_URL', '').strip().rstrip('/')
 
 ALLOWED_HOSTS = _env_list('ALLOWED_HOSTS', '127.0.0.1,localhost')
+
+if DEBUG and ALLOW_ALL_HOSTS_IN_DEBUG:
+    ALLOWED_HOSTS = ['*']
+else:
+    for host in _local_ipv4_hosts():
+        if host not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(host)
+
+if APP_BASE_URL:
+    parsed_base_url = urlparse(APP_BASE_URL)
+    if parsed_base_url.hostname:
+        _append_unique(ALLOWED_HOSTS, parsed_base_url.hostname)
 
 
 # Application definition
@@ -142,10 +244,7 @@ WSGI_APPLICATION = 'neuromeet.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': _database_config()
 }
 
 
@@ -187,9 +286,11 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+STATIC_ROOT = Path(os.getenv('STATIC_ROOT', str(BASE_DIR / 'staticfiles')))
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = Path(os.getenv('MEDIA_ROOT', str(BASE_DIR / 'media')))
+SERVE_MEDIA = _env_bool('SERVE_MEDIA', DEBUG)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -201,8 +302,29 @@ LOGIN_REDIRECT_URL = 'app_home'
 LOGOUT_REDIRECT_URL = 'login'
 
 CSRF_TRUSTED_ORIGINS = _env_list('CSRF_TRUSTED_ORIGINS')
+if APP_BASE_URL and urlparse(APP_BASE_URL).scheme in {'http', 'https'}:
+    _append_unique(CSRF_TRUSTED_ORIGINS, APP_BASE_URL)
+
 ENABLE_HTTPS = _env_bool('ENABLE_HTTPS', False)
+ALLOW_EMBEDDED_PREVIEW = _env_bool('ALLOW_EMBEDDED_PREVIEW', DEBUG)
+USE_WHITENOISE = _env_bool('USE_WHITENOISE', False)
+
+if USE_WHITENOISE:
+    try:
+        import whitenoise  # noqa: F401
+    except ImportError as exc:
+        if DEBUG:
+            USE_WHITENOISE = False
+        else:
+            raise RuntimeError(
+                "WhiteNoise is required when USE_WHITENOISE is enabled in production."
+            ) from exc
+
+if USE_WHITENOISE:
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
 SECURE_SSL_REDIRECT = ENABLE_HTTPS
 SESSION_COOKIE_SECURE = ENABLE_HTTPS
 CSRF_COOKIE_SECURE = ENABLE_HTTPS
@@ -212,6 +334,23 @@ SECURE_HSTS_PRELOAD = ENABLE_HTTPS
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 X_FRAME_OPTIONS = 'DENY'
+
+if ALLOW_EMBEDDED_PREVIEW:
+    MIDDLEWARE = [
+        middleware
+        for middleware in MIDDLEWARE
+        if middleware != 'django.middleware.clickjacking.XFrameOptionsMiddleware'
+    ]
+
+if USE_WHITENOISE:
+    STORAGES = {
+        'default': {
+            'BACKEND': 'django.core.files.storage.FileSystemStorage',
+        },
+        'staticfiles': {
+            'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        },
+    }
 
 # Social Auth (set these in your environment)
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY', '')
