@@ -5,8 +5,7 @@ services:
     plan: free
     region: oregon
     buildCommand: pip install -r requirements.txt && cd neuromeet && python manage.py collectstatic --no-input
-    preDeployCommand: cd neuromeet && python manage.py migrate --no-input
-    startCommand: cd neuromeet && daphne -b 0.0.0.0 -p $PORT neuromeet.asgi:application
+    startCommand: cd neuromeet && python manage.py migrate --no-input && daphne -b 0.0.0.0 -p $PORT neuromeet.asgi:application
     healthCheckPath: /
     envVars:
       - key: DJANGO_SECRET_KEY
